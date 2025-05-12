@@ -5,6 +5,7 @@ import datetime
 from utils.data_processor import create_demo_data, suggest_columns
 import plotly.express as px
 import plotly.graph_objects as go
+import time
 
 def set_page_config():
     """
@@ -21,51 +22,111 @@ def load_css():
     """
     CSS 스타일을 로드합니다.
     """
-    try:
-        with open("assets/css/style.css") as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-    except FileNotFoundError:
-        # 기본 CSS 스타일 적용
-        css = """
-        <style>
-            .main {
-                background-color: #f8f9fa;
-            }
-            .st-emotion-cache-16idsys {
-                font-size: 2.5rem;
-                font-weight: 700;
-                color: #0f52ba;
-            }
-            .stButton>button {
-                background-color: #0f52ba;
-                color: white;
-                border-radius: 5px;
-                border: none;
-                padding: 10px 24px;
-                font-weight: 600;
-            }
-            .stButton>button:hover {
-                background-color: #0d47a1;
-            }
-            .dashboard-card {
-                background-color: white;
-                border-radius: 10px;
-                padding: 20px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                margin-bottom: 20px;
-            }
-            .metric-value {
-                font-size: 2rem;
-                font-weight: 700;
-                color: #0f52ba;
-            }
-            .metric-label {
-                font-size: 1rem;
-                color: #6c757d;
-            }
-        </style>
-        """
-        st.markdown(css, unsafe_allow_html=True)
+    st.markdown("""
+    <style>
+    .dashboard-card {
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .metric-card {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .metric-value {
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: #1f77b4;
+        margin: 10px 0;
+    }
+    .metric-label {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-bottom: 5px;
+    }
+    .metric-change {
+        font-size: 0.8rem;
+        color: #059669;
+    }
+    .metric-change.negative {
+        color: #dc2626;
+    }
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 2px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 45px;
+        white-space: pre-wrap;
+        background-color: #f8f9fa;
+        border-radius: 4px 4px 0 0;
+        gap: 1px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: #ffffff;
+        border-bottom: 2px solid #1f77b4;
+    }
+    .stDataFrame {
+        font-size: 0.85rem;
+    }
+    .stButton button {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+    .stSelectbox, .stMultiselect {
+        font-size: 0.85rem;
+    }
+    .stRadio > div {
+        font-size: 0.85rem;
+    }
+    .stTextInput > div > div > input {
+        font-size: 0.85rem;
+    }
+    .stMarkdown {
+        font-size: 0.85rem;
+    }
+    .stSubheader {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+    }
+    .stTitle {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 0.8rem;
+    }
+    .stCaption {
+        font-size: 0.75rem;
+    }
+    .stAlert {
+        font-size: 0.85rem;
+    }
+    .stProgress > div > div > div {
+        background-color: #1f77b4;
+    }
+    .stSpinner > div > div {
+        border-color: #1f77b4;
+    }
+    .stInfo {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+    .stWarning {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+    .stError {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 def render_sidebar(df=None):
     """
@@ -77,48 +138,31 @@ def render_sidebar(df=None):
     Returns:
         설정값 딕셔너리
     """
+    # 기본 설정값 초기화
+    config = {
+        "uploaded_file": None,
+        "use_demo": False,
+        "category_col": None,
+        "value_col": None,
+        "dashboard_style": "기본 대시보드"
+    }
+    
     with st.sidebar:
-        st.header("설정")
+        st.title("TalentMetrics")
+        st.markdown("---")
         
-        # 파일 업로더에 고유한 key 추가
+        # 파일 업로드
         uploaded_file = st.file_uploader(
-            "엑셀 파일 업로드", 
+            "엑셀 파일 업로드",
             type=["xlsx", "xls"],
-            key="excel_file_uploader"  # 고유한 key 추가
+            help="채용 데이터가 포함된 엑셀 파일을 업로드하세요."
         )
+        config["uploaded_file"] = uploaded_file
         
-        # 기본 설정값
-        config = {
-            "uploaded_file": uploaded_file,
-            "sheet_name": None,
-            "category_col": None,
-            "value_col": None,
-            "dashboard_style": "기본 대시보드"
-        }
-        
-        if uploaded_file is None:
-            st.info("엑셀 파일을 업로드해주세요.")
-            st.markdown("""
-            ### 예시 데이터 형식
-            아래와 같은 형식의 엑셀 파일을 업로드하세요:
-            
-            | 부서 | 인원수 |
-            |------|-------|
-            | 인사팀 | 5 |
-            | 마케팅 | 8 |
-            | 개발팀 | 12 |
-            | ... | ... |
-            """)
-            
-            # 데모 데이터 다운로드 버튼
-            if st.button("데모 데이터 다운로드"):
-                demo_data = create_demo_data()
-                st.download_button(
-                    label="데모 엑셀 파일 다운로드",
-                    data=demo_data,
-                    file_name="hr_demo_data.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
+        # 데모 데이터 버튼
+        if st.button("데모 데이터 사용", help="샘플 데이터로 대시보드를 체험해보세요."):
+            config["use_demo"] = True
+            return config
         
         if df is not None:
             # 데이터 미리보기
@@ -182,29 +226,44 @@ def render_metrics(summary, category_col, value_col):
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-        st.metric("총 부서 수", summary["total_categories"], "")
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-label">총 {}</div>
+            <div class="metric-value">{:,}</div>
+        </div>
+        """.format(value_col, summary.get("total_value", 0)), unsafe_allow_html=True)
     
     with col2:
-        st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-        st.metric("총 인원", summary["total_value"], "")
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-label">평균 {}</div>
+            <div class="metric-value">{:,.1f}</div>
+        </div>
+        """.format(value_col, summary.get("avg_value", 0)), unsafe_allow_html=True)
     
     with col3:
-        st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-        st.metric("평균 인원/부서", round(summary["avg_value"], 1), "")
-        st.markdown('</div>', unsafe_allow_html=True)
+        max_category = summary.get("max_category", {})
+        max_value = max_category.get(value_col, 0) if isinstance(max_category, dict) else 0
+        max_name = max_category.get(category_col, "N/A") if isinstance(max_category, dict) else "N/A"
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-label">최대 {}</div>
+            <div class="metric-value">{:,}</div>
+            <div class="metric-change">{}</div>
+        </div>
+        """.format(value_col, max_value, max_name), unsafe_allow_html=True)
     
     with col4:
-        st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-        if summary["max_category"]:
-            max_cat = summary["max_category"]
-            st.metric(
-                "최다 채용 부서", 
-                f"{max_cat[category_col]} ({max_cat[value_col]}명)"
-            )
-        st.markdown('</div>', unsafe_allow_html=True)
+        min_category = summary.get("min_category", {})
+        min_value = min_category.get(value_col, 0) if isinstance(min_category, dict) else 0
+        min_name = min_category.get(category_col, "N/A") if isinstance(min_category, dict) else "N/A"
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-label">최소 {}</div>
+            <div class="metric-value">{:,}</div>
+            <div class="metric-change">{}</div>
+        </div>
+        """.format(value_col, min_value, min_name), unsafe_allow_html=True)
 
 def render_comparison_section(df, category_col, value_col, comparison_data, comparison_chart):
     """
@@ -256,6 +315,12 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
     """
     HR 지표 대시보드를 렌더링합니다.
     """
+    # 메시지 표시 및 자동 제거
+    message_placeholder = st.empty()
+    message_placeholder.info("데이터 처리 중...")
+    time.sleep(0.5)  # 0.5초 대기
+    message_placeholder.empty()
+    
     st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
     st.subheader("📈 HR 핵심 지표")
     
@@ -360,6 +425,12 @@ def render_enhanced_comparison_section(df, category_col, value_col, comparison_d
     """
     개선된 비교 분석 섹션을 렌더링합니다.
     """
+    # 메시지 표시 및 자동 제거
+    message_placeholder = st.empty()
+    message_placeholder.info("비교 분석 중...")
+    time.sleep(0.5)  # 0.5초 대기
+    message_placeholder.empty()
+    
     st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
     
     # 비교 차트
@@ -414,9 +485,12 @@ def render_empty_state():
     """
     파일이 업로드되지 않았을 때 표시할 빈 상태를 렌더링합니다.
     """
-    st.markdown('<div style="text-align: center; padding: 50px 0;">', unsafe_allow_html=True)
-    st.image("https://cdn-icons-png.flaticon.com/512/8891/8891165.png", width=150)
-    st.markdown("## HR 채용 현황 대시보드")
-    st.markdown("이 대시보드는 부서별 채용 현황을 시각화하는 도구입니다.")
-    st.markdown("사용하려면 사이드바에서 엑셀 파일을 업로드해주세요.")
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="text-align: center; padding: 50px 20px;">
+        <h2 style="color: #6b7280; margin-bottom: 20px;">데이터를 업로드해주세요</h2>
+        <p style="color: #6b7280; margin-bottom: 30px;">
+            채용 데이터가 포함된 엑셀 파일을 업로드하여 대시보드를 시작하세요.<br>
+            또는 데모 데이터를 사용하여 기능을 체험해보세요.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)

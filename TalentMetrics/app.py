@@ -35,7 +35,7 @@ load_css()
 st.title("TalentMetrics - HR 채용 대시보드")
 st.markdown("""
 <div style="margin-bottom: 20px;">
-    <span style="color: #6b7280; font-size: 1.1rem;">
+    <span style="color: #6b7280; font-size: 1rem;">
         채용 데이터를 시각화하고 핵심 인사이트를 발견하세요
     </span>
 </div>
@@ -243,27 +243,20 @@ def main():
                     st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
                     st.subheader("채용 분포")
                     
-                    # 선버스트 차트 (새로운 차트 타입)
-                    sunburst_fig = create_sunburst_chart(
-                        processed_df,
+                    # 파이 차트 생성
+                    pie_df = processed_df.head(10) if len(processed_df) > 10 else processed_df
+                    pie_fig = create_pie_chart(
+                        pie_df,
                         category_col,
                         value_col,
-                        color_scheme=color_scheme
+                        color_scheme
                     )
+                    if pie_fig:
+                        st.plotly_chart(pie_fig, use_container_width=True)
                     
-                    if sunburst_fig:
-                        st.plotly_chart(sunburst_fig, use_container_width=True)
-                    else:
-                        # 대체 차트 (선버스트 실패 시)
-                        pie_df = processed_df.head(10) if len(processed_df) > 10 else processed_df
-                        pie_fig = create_pie_chart(
-                            pie_df,
-                            category_col,
-                            value_col,
-                            color_scheme
-                        )
-                        if pie_fig:
-                            st.plotly_chart(pie_fig, use_container_width=True)
+                    # 데이터가 많을 경우 알림
+                    if len(processed_df) > 10:
+                        st.caption(f"* 상위 10개 {category_col}만 표시됩니다.")
                     
                     st.markdown('</div>', unsafe_allow_html=True)
                 
@@ -392,9 +385,6 @@ def main():
                     
                     st.markdown('</div>', unsafe_allow_html=True)
                 
-                # 여기에 다른 시각화 옵션 추가 (상자 그림, 버블 차트, 효율성 분석 등)
-                # 예시 코드는 간결함을 위해 생략합니다
-                
                 # 상세 데이터 테이블
                 st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
                 st.subheader("상세 데이터")
@@ -445,7 +435,7 @@ def main():
                 # 부서 비교 설명
                 st.markdown("""
                 <div style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-                    <p style="margin: 0;">두 개의 부서를 선택하여 채용 현황을 비교해보세요. 
+                    <p style="margin: 0; font-size: 0.9rem;">두 개의 부서를 선택하여 채용 현황을 비교해보세요. 
                     인원수, 효율성, 성장률 등 다양한 지표를 기반으로 비교 분석 결과를 확인할 수 있습니다.</p>
                 </div>
                 """, unsafe_allow_html=True)
@@ -496,8 +486,6 @@ def main():
                     )
                 
                 st.markdown('</div>', unsafe_allow_html=True)
-                
-                # 여기에 다중 부서 비교 및 추가 비교 분석 기능 추가
             
             with tab4:
                 st.subheader("고급 분석")
