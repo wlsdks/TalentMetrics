@@ -280,10 +280,21 @@ def main():
     sheet_names = []
     df = None
     sheet_name = None
-    
+
     # 사이드바 렌더링
     config = render_sidebar()
     uploaded_file = config["uploaded_file"]
+    use_demo = config.get("use_demo", False)
+
+    # 데모 데이터 사용 버튼이 눌렸을 때만 처리
+    if use_demo:
+        demo_excel = create_demo_data()
+        excel_file, sheet_names = load_excel_file(demo_excel)
+        if excel_file and sheet_names:
+            # 첫 번째 시트 자동 선택
+            sheet_name = sheet_names[0]
+            df = read_sheet_data(excel_file, sheet_name)
+            uploaded_file = demo_excel  # 이후 로직에서 업로드 파일처럼 취급
     
     if uploaded_file is not None:
         # 로딩 스피너

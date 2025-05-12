@@ -5,6 +5,8 @@ import numpy as np
 from io import BytesIO
 from datetime import datetime, timedelta
 import io
+import random
+from dummy.generate_demo_excel import generate_rich_demo_excel
 
 def load_excel_file(uploaded_file):
     """
@@ -220,25 +222,9 @@ def generate_comparison_data(df, category_col, value_col, cat1, cat2):
 
 def create_demo_data():
     """
-    데모용 샘플 데이터를 생성합니다.
+    풍부한 HR 데모 데이터를 생성하여 BytesIO로 반환합니다.
     """
-    # 부서 및 인원 데이터
-    departments = ['인사팀', '마케팅', '개발팀', 'IT지원', '영업', '고객지원', 
-                  '디자인', '연구개발', '재무', '법무', '인프라', '경영지원']
-    headcounts = [5, 8, 12, 4, 10, 7, 3, 6, 4, 2, 5, 3]
-    
-    # 데이터프레임 생성
-    df = pd.DataFrame({
-        '부서': departments,
-        '인원수': headcounts
-    })
-    
-    # 엑셀 파일로 변환
-    excel_buffer = BytesIO()
-    df.to_excel(excel_buffer, index=False)
-    excel_buffer.seek(0)
-    
-    return excel_buffer
+    return generate_rich_demo_excel()
 
 def validate_data(df):
     """

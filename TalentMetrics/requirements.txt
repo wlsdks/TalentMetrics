@@ -10,3 +10,4 @@ calmap==0.0.9
 scipy==1.12.0
 statsmodels==0.14.1
 scikit-learn==1.4.0
+xlsxwriter==3.1.2
