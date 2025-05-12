@@ -34,7 +34,7 @@ def main():
     df = None
     sheet_name = None
     
-    # 사이드바 렌더링
+    # 사이드바 렌더링 (최초 한 번만 호출)
     config = render_sidebar()
     uploaded_file = config["uploaded_file"]
     
@@ -43,15 +43,48 @@ def main():
         excel_file, sheet_names = load_excel_file(uploaded_file)
         
         if excel_file and sheet_names:
-            # 시트 선택
-            sheet_name = st.sidebar.selectbox("시트 선택", sheet_names)
+            # 시트 선택 (시트 선택 부분은 사이드바에 추가)
+            sheet_name = st.sidebar.selectbox("시트 선택", sheet_names, key="sheet_selector")
             
             if sheet_name:
                 # 데이터 로드
                 df = read_sheet_data(excel_file, sheet_name)
                 
-                # 사이드바 업데이트 (데이터 로드 후)
-                config = render_sidebar(df)
+                # 데이터프레임을 가지고 다른 UI 구성 요소 업데이트
+                if df is not None:
+                    # 카테고리 열과 값 열 선택 (시트가 로드된 후 사이드바에 추가)
+                    with st.sidebar:
+                        st.subheader("데이터 설정")
+                        
+                        # 모든 열 목록
+                        all_columns = df.columns.tolist()
+                        
+                        # 사용자 정의 키를 사용하여 selectbox 생성
+                        category_col = st.selectbox(
+                            "부서/카테고리 열 선택",
+                            all_columns,
+                            key="category_col_select"
+                        )
+                        config["category_col"] = category_col
+                        
+                        # 값 열 선택
+                        numeric_cols = df.select_dtypes(include=['number']).columns.tolist()
+                        if numeric_cols:
+                            value_col = st.selectbox(
+                                "인원수/값 열 선택",
+                                all_columns,
+                                key="value_col_select"
+                            )
+                            config["value_col"] = value_col
+                        
+                        # 대시보드 스타일 선택
+                        st.subheader("대시보드 스타일")
+                        dashboard_style = st.selectbox(
+                            "스타일 선택",
+                            ["기본 대시보드", "모던 블루", "다크 테마", "미니멀리스트", "HR 특화"],
+                            key="style_select"
+                        )
+                        config["dashboard_style"] = dashboard_style
     
     # 데이터가 로드된 경우 대시보드 표시
     if df is not None and "category_col" in config and "value_col" in config:

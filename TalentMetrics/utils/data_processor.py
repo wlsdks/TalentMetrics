@@ -57,19 +57,33 @@ def process_data(df, category_col, value_col):
     if df is None or category_col is None or value_col is None:
         return None
     
-    # 필요한 열만 선택
-    processed_df = df[[category_col, value_col]].copy()
+    # 데이터프레임 및 열 확인
+    if category_col not in df.columns or value_col not in df.columns:
+        return None
     
-    # 결측치 제거
-    processed_df = processed_df.dropna()
+    try:
+        # 필요한 열만 선택
+        processed_df = df[[category_col, value_col]].copy()
+        
+        # 결측치 제거
+        processed_df = processed_df.dropna()
+        
+        # 카테고리 열 데이터 타입 확인 및 변환 (문자열로)
+        processed_df[category_col] = processed_df[category_col].astype(str)
+        
+        # 중복된 카테고리 합치기
+        # 명시적으로 그룹화할 열과 합산할 열 지정
+        grouped = processed_df.groupby(category_col, as_index=False)
+        processed_df = grouped[value_col].sum()
+        
+        # 내림차순 정렬
+        processed_df = processed_df.sort_values(by=value_col, ascending=False)
+        
+        return processed_df
     
-    # 중복된 카테고리 합치기
-    processed_df = processed_df.groupby(category_col).sum().reset_index()
-    
-    # 내림차순 정렬
-    processed_df = processed_df.sort_values(by=value_col, ascending=False)
-    
-    return processed_df
+    except Exception as e:
+        st.error(f"데이터 처리 중 오류 발생: {e}")
+        return None
 
 def calculate_summary(df, value_col):
     """

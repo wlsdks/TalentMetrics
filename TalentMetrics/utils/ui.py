@@ -69,14 +69,21 @@ def render_sidebar(df=None):
     """
     사이드바 UI를 렌더링합니다.
     
+    Args:
+        df: 데이터프레임
+        
     Returns:
-        dict: 사이드바에서 설정한 값들
+        설정값 딕셔너리
     """
     with st.sidebar:
         st.header("설정")
         
-        # 파일 업로드
-        uploaded_file = st.file_uploader("엑셀 파일 업로드", type=["xlsx", "xls"])
+        # 파일 업로더에 고유한 key 추가
+        uploaded_file = st.file_uploader(
+            "엑셀 파일 업로드", 
+            type=["xlsx", "xls"],
+            key="excel_file_uploader"  # 고유한 key 추가
+        )
         
         # 기본 설정값
         config = {

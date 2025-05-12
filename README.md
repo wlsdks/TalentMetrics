@@ -53,3 +53,4 @@ streamlit run TalentMetrics/app.py
 - Python 3.11 버전을 사용해야 합니다 (최신 버전은 pandas 호환성 문제가 있을 수 있음)
 - 가상환경이 활성화된 상태에서만 실행해야 합니다
 - 실행이 되면 자동으로 인터넷창이 열립니다.
+- http://localhost:8501
