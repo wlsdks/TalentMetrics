@@ -1,6 +1,8 @@
 @echo off
-echo TalentMetrics - HR 대시보드 프로그램을 시작합니다...
-echo.
+REM assets\css 폴더가 없으면 생성
+if not exist "assets\css" (
+    mkdir assets\css
+)
 
 REM 가상환경이 있는지 확인
 if not exist "venv" (
