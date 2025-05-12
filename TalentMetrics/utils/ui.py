@@ -414,7 +414,16 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
             title="부서별 인력 분포",
             xaxis_title="부서",
             yaxis_title="인원수",
-            height=400
+            height=400,
+            template="plotly_white",
+            font=dict(
+                family="Arial, sans-serif",
+                size=12,
+                color="#7f7f7f"
+            ),
+            margin=dict(l=40, r=40, t=40, b=40),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)"
         )
         
         st.plotly_chart(fig, use_container_width=True)
