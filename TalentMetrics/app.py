@@ -34,7 +34,7 @@ def main():
     df = None
     sheet_name = None
     
-    # 사이드바 렌더링 (최초 한 번만 호출)
+    # 사이드바 렌더링 - 한 번만 호출
     config = render_sidebar()
     uploaded_file = config["uploaded_file"]
     
@@ -50,9 +50,9 @@ def main():
                 # 데이터 로드
                 df = read_sheet_data(excel_file, sheet_name)
                 
-                # 데이터프레임을 가지고 다른 UI 구성 요소 업데이트
+                # 데이터프레임 로드된 후 필요한 UI 컴포넌트 추가
                 if df is not None:
-                    # 카테고리 열과 값 열 선택 (시트가 로드된 후 사이드바에 추가)
+                    # 카테고리 열과 값 열 선택 (직접 사이드바에 추가)
                     with st.sidebar:
                         st.subheader("데이터 설정")
                         
@@ -68,14 +68,12 @@ def main():
                         config["category_col"] = category_col
                         
                         # 값 열 선택
-                        numeric_cols = df.select_dtypes(include=['number']).columns.tolist()
-                        if numeric_cols:
-                            value_col = st.selectbox(
-                                "인원수/값 열 선택",
-                                all_columns,
-                                key="value_col_select"
-                            )
-                            config["value_col"] = value_col
+                        value_col = st.selectbox(
+                            "인원수/값 열 선택",
+                            all_columns,
+                            key="value_col_select"
+                        )
+                        config["value_col"] = value_col
                         
                         # 대시보드 스타일 선택
                         st.subheader("대시보드 스타일")

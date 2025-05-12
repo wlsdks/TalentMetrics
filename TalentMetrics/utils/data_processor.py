@@ -54,35 +54,47 @@ def process_data(df, category_col, value_col):
     """
     시각화를 위해 데이터를 처리합니다.
     """
+    # 기본 검증
     if df is None or category_col is None or value_col is None:
+        st.error("데이터 또는 선택한 열이 없습니다.")
         return None
     
-    # 데이터프레임 및 열 확인
     if category_col not in df.columns or value_col not in df.columns:
+        st.error(f"선택한 열({category_col} 또는 {value_col})이 데이터프레임에 존재하지 않습니다.")
         return None
     
     try:
-        # 필요한 열만 선택
-        processed_df = df[[category_col, value_col]].copy()
+        # 데이터 확인
+        st.info(f"열 정보: {category_col}(유형: {df[category_col].dtype}), {value_col}(유형: {df[value_col].dtype})")
         
-        # 결측치 제거
-        processed_df = processed_df.dropna()
+        # 오류 해결을 위한 방법 1: 데이터 직접 생성
+        # 부서별 집계를 수동으로 수행
+        categories = df[category_col].astype(str).unique()
+        result_data = []
         
-        # 카테고리 열 데이터 타입 확인 및 변환 (문자열로)
-        processed_df[category_col] = processed_df[category_col].astype(str)
+        for cat in categories:
+            # 각 카테고리별로 값들을 필터링하고 합계 계산
+            cat_values = df[df[category_col].astype(str) == cat][value_col]
+            if not cat_values.empty:
+                result_data.append({
+                    category_col: cat,
+                    value_col: cat_values.sum()
+                })
         
-        # 중복된 카테고리 합치기
-        # 명시적으로 그룹화할 열과 합산할 열 지정
-        grouped = processed_df.groupby(category_col, as_index=False)
-        processed_df = grouped[value_col].sum()
+        # 새 데이터프레임 생성
+        result_df = pd.DataFrame(result_data)
         
         # 내림차순 정렬
-        processed_df = processed_df.sort_values(by=value_col, ascending=False)
+        if not result_df.empty:
+            result_df = result_df.sort_values(by=value_col, ascending=False)
         
-        return processed_df
-    
+        st.success("데이터 처리 완료!")
+        return result_df
+        
     except Exception as e:
-        st.error(f"데이터 처리 중 오류 발생: {e}")
+        st.error(f"데이터 처리 중 오류 발생: {str(e)}")
+        st.write("카테고리 열 샘플:", df[category_col].head())
+        st.write("값 열 샘플:", df[value_col].head())
         return None
 
 def calculate_summary(df, value_col):
@@ -92,26 +104,37 @@ def calculate_summary(df, value_col):
     if df is None or df.empty or value_col not in df.columns:
         return {}
     
-    total_categories = len(df)
-    total_value = df[value_col].sum()
-    avg_value = df[value_col].mean()
-    median_value = df[value_col].median()
-    
-    # 최대값과 최소값 (인덱스와 값)
-    max_idx = df[value_col].idxmax() if not df.empty else None
-    min_idx = df[value_col].idxmin() if not df.empty else None
-    
-    max_category = df.iloc[df.index.get_indexer([max_idx])[0]].to_dict() if max_idx is not None else {}
-    min_category = df.iloc[df.index.get_indexer([min_idx])[0]].to_dict() if min_idx is not None else {}
-    
-    return {
-        "total_categories": total_categories,
-        "total_value": total_value,
-        "avg_value": avg_value,
-        "median_value": median_value,
-        "max_category": max_category,
-        "min_category": min_category
-    }
+    try:
+        total_categories = len(df)
+        total_value = df[value_col].sum()
+        avg_value = df[value_col].mean()
+        median_value = df[value_col].median()
+        
+        # 최대값과 최소값 (행 기준)
+        max_row = df.loc[df[value_col].idxmax()]
+        min_row = df.loc[df[value_col].idxmin()]
+        
+        max_category = max_row.to_dict()
+        min_category = min_row.to_dict()
+        
+        return {
+            "total_categories": total_categories,
+            "total_value": total_value,
+            "avg_value": avg_value,
+            "median_value": median_value,
+            "max_category": max_category,
+            "min_category": min_category
+        }
+    except Exception as e:
+        st.error(f"요약 통계 계산 중 오류 발생: {str(e)}")
+        return {
+            "total_categories": len(df) if df is not None else 0,
+            "total_value": 0,
+            "avg_value": 0,
+            "median_value": 0,
+            "max_category": {},
+            "min_category": {}
+        }
 
 def generate_comparison_data(df, category_col, value_col, cat1, cat2):
     """
@@ -120,39 +143,43 @@ def generate_comparison_data(df, category_col, value_col, cat1, cat2):
     if df is None or df.empty:
         return {"error": "데이터가 없습니다"}
     
-    # 해당 카테고리 찾기
-    cat1_data = df[df[category_col] == cat1]
-    cat2_data = df[df[category_col] == cat2]
-    
-    if cat1_data.empty or cat2_data.empty:
-        return {"error": "선택한 카테고리를 찾을 수 없습니다"}
-    
-    cat1_value = cat1_data[value_col].values[0]
-    cat2_value = cat2_data[value_col].values[0]
-    
-    # 차이와 비율 계산
-    diff = cat1_value - cat2_value
-    percent_diff = (diff / cat2_value) * 100 if cat2_value != 0 else 0
-    
-    # 평균과 비교
-    avg_value = df[value_col].mean()
-    cat1_vs_avg = ((cat1_value - avg_value) / avg_value) * 100 if avg_value != 0 else 0
-    cat2_vs_avg = ((cat2_value - avg_value) / avg_value) * 100 if avg_value != 0 else 0
-    
-    return {
-        "category1": {
-            "name": cat1,
-            "value": cat1_value,
-            "vs_avg": cat1_vs_avg
-        },
-        "category2": {
-            "name": cat2,
-            "value": cat2_value,
-            "vs_avg": cat2_vs_avg
-        },
-        "diff": diff,
-        "percent_diff": percent_diff
-    }
+    try:
+        # 해당 카테고리 찾기
+        cat1_data = df[df[category_col] == cat1]
+        cat2_data = df[df[category_col] == cat2]
+        
+        if cat1_data.empty or cat2_data.empty:
+            return {"error": "선택한 카테고리를 찾을 수 없습니다"}
+        
+        cat1_value = cat1_data[value_col].values[0]
+        cat2_value = cat2_data[value_col].values[0]
+        
+        # 차이와 비율 계산
+        diff = cat1_value - cat2_value
+        percent_diff = (diff / cat2_value) * 100 if cat2_value != 0 else 0
+        
+        # 평균과 비교
+        avg_value = df[value_col].mean()
+        cat1_vs_avg = ((cat1_value - avg_value) / avg_value) * 100 if avg_value != 0 else 0
+        cat2_vs_avg = ((cat2_value - avg_value) / avg_value) * 100 if avg_value != 0 else 0
+        
+        return {
+            "category1": {
+                "name": cat1,
+                "value": cat1_value,
+                "vs_avg": cat1_vs_avg
+            },
+            "category2": {
+                "name": cat2,
+                "value": cat2_value,
+                "vs_avg": cat2_vs_avg
+            },
+            "diff": diff,
+            "percent_diff": percent_diff
+        }
+    except Exception as e:
+        st.error(f"비교 데이터 생성 중 오류 발생: {str(e)}")
+        return {"error": f"비교 데이터 생성 중 오류 발생: {str(e)}"}
 
 def create_demo_data():
     """
