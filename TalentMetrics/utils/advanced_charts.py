@@ -54,21 +54,29 @@ def create_radar_chart(df, category_col, metrics_cols, color_scheme=None):
         return None
     
     try:
+        # 인덱스 재설정
+        df = df.reset_index(drop=True)
+        
         # 최대 5개 카테고리만 선택 (너무 많으면 가독성이 떨어짐)
         top_categories = df[category_col].unique()[:5]
-        filtered_df = df[df[category_col].isin(top_categories)]
+        filtered_df = df[df[category_col].isin(top_categories)].reset_index(drop=True)
+        
+        # 숫자형 열이 충분한지 확인
+        if len(metrics_cols) < 3:
+            st.warning("레이더 차트를 생성하려면 3개 이상의 숫자형 열이 필요합니다.")
+            return None
         
         # 각 카테고리별로 데이터 정규화 (0~1 사이)
-        normalized_df = pd.DataFrame()
+        normalized_df = pd.DataFrame(index=filtered_df.index)
         
         for col in metrics_cols:
             if col in df.columns:
                 max_val = df[col].max()
                 min_val = df[col].min()
                 if max_val > min_val:
-                    normalized_df[col] = (df[col] - min_val) / (max_val - min_val)
+                    normalized_df[col] = (filtered_df[col] - min_val) / (max_val - min_val)
                 else:
-                    normalized_df[col] = df[col] / max_val if max_val > 0 else df[col]
+                    normalized_df[col] = filtered_df[col] / max_val if max_val > 0 else filtered_df[col]
         
         # 레이더 차트 생성
         fig = go.Figure()

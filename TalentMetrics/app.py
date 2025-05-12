@@ -753,19 +753,24 @@ def main():
                 
                 st.markdown('</div>', unsafe_allow_html=True)
             
-            with tab4:
-                st.subheader("고급 분석")
+            with tab4:    
+                col1, col2 = st.columns(2)
                 
-                # 이상치 분석
-                st.write("### 이상치 분석")
-                outliers = detect_outliers(processed_df, value_col)
-                if not outliers.empty:
-                    st.plotly_chart(create_outlier_chart(processed_df, value_col, outliers))
-                    st.write(f"발견된 이상치 수: {len(outliers)}")
+                # 이상치 분석 (좌측)
+                with col1:
+                    st.write("### 이상치 분석")
+                    outliers = detect_outliers(processed_df, value_col)
+                    if not outliers.empty:
+                        st.plotly_chart(create_outlier_chart(processed_df, value_col, outliers), use_container_width=True)
+                        st.write(f"발견된 이상치 수: {len(outliers)}")
+                    else:
+                        st.info("이상치가 발견되지 않았습니다.")
+                        st.plotly_chart(create_outlier_chart(processed_df, value_col, outliers), use_container_width=True)
                 
-                # 분포 분석
-                st.write("### 분포 분석")
-                st.plotly_chart(create_distribution_chart(processed_df, value_col))
+                # 분포 분석 (우측)
+                with col2:
+                    st.write("### 분포 분석")
+                    st.plotly_chart(create_distribution_chart(processed_df, value_col), use_container_width=True)
                 
                 # 상관관계 분석
                 if len(processed_df.select_dtypes(include=['number']).columns) > 1:

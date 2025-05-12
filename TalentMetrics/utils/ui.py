@@ -321,15 +321,15 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
     time.sleep(0.5)  # 0.5초 대기
     message_placeholder.empty()
     
-    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+    st.markdown('<div class="dashboard-card" style="padding: 20px;">', unsafe_allow_html=True)
     st.subheader("📈 HR 핵심 지표")
     
-    # HR 핵심 지표를 박스 형태로 스타일링
+    # HR 핵심 지표를 박스 형태로 스타일링하고 공백 추가
     col1, col2, col3, col4 = st.columns(4, gap="large")
 
     with col1:
         st.markdown("""
-        <div class="metric-card">
+        <div class="metric-card" style="margin-bottom: 20px;">
             <div class="metric-label">총 인력</div>
             <div class="metric-value">{:,}명</div>
         </div>
@@ -337,7 +337,7 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
 
     with col2:
         st.markdown("""
-        <div class="metric-card">
+        <div class="metric-card" style="margin-bottom: 20px;">
             <div class="metric-label">평균 인력</div>
             <div class="metric-value">{:.1f}명</div>
         </div>
@@ -346,7 +346,7 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
     with col3:
         if 'total_budget' in hr_metrics:
             st.markdown("""
-            <div class="metric-card">
+            <div class="metric-card" style="margin-bottom: 20px;">
                 <div class="metric-label">총 예산</div>
                 <div class="metric-value">{:,}원</div>
             </div>
@@ -356,7 +356,7 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
         if 'yearly_growth_rates' in hr_metrics:
             latest_growth = list(hr_metrics['yearly_growth_rates'].values())[-1]
             st.markdown("""
-            <div class="metric-card">
+            <div class="metric-card" style="margin-bottom: 20px;">
                 <div class="metric-label">연간 성장률</div>
                 <div class="metric-value">{:.1f}%</div>
             </div>
