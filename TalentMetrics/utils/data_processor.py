@@ -72,7 +72,8 @@ def process_data(df, category_col, value_col):
     
     try:
         # 데이터 확인
-        st.info(f"열 정보: {category_col}(유형: {df[category_col].dtype}), {value_col}(유형: {df[value_col].dtype})")
+        # st.info(f"열 정보: {category_col}(유형: {df[category_col].dtype}), {value_col}(유형: {df[value_col].dtype})")
+        st.toast(f"열 정보: {category_col}(유형: {df[category_col].dtype}), {value_col}(유형: {df[value_col].dtype})", icon="ℹ️")
         
         # 오류 해결을 위한 방법 1: 데이터 직접 생성
         # 부서별 집계를 수동으로 수행
@@ -104,7 +105,8 @@ def process_data(df, category_col, value_col):
         if not result_df.empty:
             result_df = result_df.sort_values(by=value_col, ascending=False)
         
-        st.success("데이터 처리 완료!")
+        # st.success("데이터 처리 완료!")
+        st.toast("데이터 처리 완료!", icon="✅")
         return result_df
         
     except Exception as e:
