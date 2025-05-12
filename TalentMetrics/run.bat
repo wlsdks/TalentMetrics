@@ -1,5 +1,5 @@
 @echo off
-echo HR 대시보드 프로그램을 시작합니다...
+echo TalentMetrics - HR 대시보드 프로그램을 시작합니다...
 echo.
 
 REM 가상환경이 있는지 확인
