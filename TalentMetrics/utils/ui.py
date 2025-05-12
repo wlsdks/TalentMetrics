@@ -3,6 +3,8 @@ import streamlit as st
 import pandas as pd
 import datetime
 from utils.data_processor import create_demo_data, suggest_columns
+import plotly.express as px
+import plotly.graph_objects as go
 
 def set_page_config():
     """
@@ -247,6 +249,164 @@ def render_comparison_section(df, category_col, value_col, comparison_data, comp
             f"{round(cat2['vs_avg'], 1)}%",
             delta=round(cat2['vs_avg'], 1)
         )
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+def render_hr_metrics_dashboard(summary, hr_metrics):
+    """
+    HR 지표 대시보드를 렌더링합니다.
+    """
+    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+    st.subheader("📈 HR 핵심 지표")
+    
+    # 기본 지표
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric(
+            "총 인력",
+            f"{hr_metrics.get('total_headcount', 0):,.0f}명",
+            delta=f"{hr_metrics.get('total_headcount', 0) - hr_metrics.get('avg_headcount', 0):,.0f}명"
+        )
+    
+    with col2:
+        st.metric(
+            "평균 인력",
+            f"{hr_metrics.get('avg_headcount', 0):,.1f}명",
+            delta=f"{hr_metrics.get('avg_headcount', 0) - hr_metrics.get('min_headcount', 0):,.1f}명"
+        )
+    
+    with col3:
+        if 'total_budget' in hr_metrics:
+            st.metric(
+                "총 예산",
+                f"{hr_metrics['total_budget']:,.0f}원",
+                f"인당 {hr_metrics.get('avg_cost_per_head', 0):,.0f}원"
+            )
+    
+    with col4:
+        if 'yearly_growth_rates' in hr_metrics:
+            latest_growth = list(hr_metrics['yearly_growth_rates'].values())[-1]
+            st.metric(
+                "연간 성장률",
+                f"{latest_growth:.1f}%",
+                delta=f"{latest_growth - list(hr_metrics['yearly_growth_rates'].values())[-2]:.1f}%"
+            )
+    
+    # 성별 분포
+    if 'gender_distribution' in hr_metrics:
+        st.subheader("성별 분포")
+        gender_data = hr_metrics['gender_distribution']
+        
+        fig = go.Figure(data=[go.Pie(
+            labels=list(gender_data.keys()),
+            values=list(gender_data.values()),
+            hole=.3
+        )])
+        
+        fig.update_layout(
+            title="성별 분포",
+            showlegend=True,
+            height=300
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+    
+    # 연령대 분포
+    if 'age_distribution' in hr_metrics:
+        st.subheader("연령대 분포")
+        age_data = hr_metrics['age_distribution']
+        
+        fig = go.Figure(data=[go.Bar(
+            x=list(age_data.keys()),
+            y=list(age_data.values()),
+            text=[f"{v:.1f}%" for v in age_data.values()],
+            textposition='auto',
+        )])
+        
+        fig.update_layout(
+            title="연령대 분포",
+            xaxis_title="연령대",
+            yaxis_title="비율 (%)",
+            height=300
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+    
+    # 부서별 분포
+    if 'department_distribution' in hr_metrics:
+        st.subheader("부서별 분포")
+        dept_data = hr_metrics['department_distribution']
+        
+        fig = go.Figure(data=[go.Bar(
+            x=list(dept_data['sum'].keys()),
+            y=list(dept_data['sum'].values()),
+            text=[f"{v:,.0f}명" for v in dept_data['sum'].values()],
+            textposition='auto',
+        )])
+        
+        fig.update_layout(
+            title="부서별 인력 분포",
+            xaxis_title="부서",
+            yaxis_title="인원수",
+            height=400
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+def render_enhanced_comparison_section(df, category_col, value_col, comparison_data, comparison_chart, hr_metrics):
+    """
+    개선된 비교 분석 섹션을 렌더링합니다.
+    """
+    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+    
+    # 비교 차트
+    st.plotly_chart(comparison_chart, use_container_width=True)
+    
+    # 상세 비교 지표
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader(f"{comparison_data['category1']['name']} 분석")
+        st.metric(
+            "인원수",
+            f"{comparison_data['category1']['value']:,.0f}명",
+            f"평균 대비 {comparison_data['category1']['vs_avg']:,.1f}%"
+        )
+        
+        if 'department_efficiency' in hr_metrics:
+            dept1_efficiency = hr_metrics['department_efficiency'].get(comparison_data['category1']['name'], {})
+            if dept1_efficiency:
+                st.metric(
+                    "인당 비용",
+                    f"{dept1_efficiency.get('cost_per_head', 0):,.0f}원"
+                )
+    
+    with col2:
+        st.subheader(f"{comparison_data['category2']['name']} 분석")
+        st.metric(
+            "인원수",
+            f"{comparison_data['category2']['value']:,.0f}명",
+            f"평균 대비 {comparison_data['category2']['vs_avg']:,.1f}%"
+        )
+        
+        if 'department_efficiency' in hr_metrics:
+            dept2_efficiency = hr_metrics['department_efficiency'].get(comparison_data['category2']['name'], {})
+            if dept2_efficiency:
+                st.metric(
+                    "인당 비용",
+                    f"{dept2_efficiency.get('cost_per_head', 0):,.0f}원"
+                )
+    
+    # 차이 분석
+    st.subheader("차이 분석")
+    st.metric(
+        "인원수 차이",
+        f"{comparison_data['diff']:,.0f}명",
+        f"{comparison_data['percent_diff']:,.1f}%"
+    )
     
     st.markdown('</div>', unsafe_allow_html=True)
 

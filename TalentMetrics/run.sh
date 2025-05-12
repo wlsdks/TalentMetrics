@@ -12,5 +12,14 @@ else
     source venv/bin/activate
 fi
 
+# 필요한 디렉토리 확인 및 생성
+if [ ! -d "assets/css" ]; then
+    mkdir -p assets/css
+fi
+
+# 필요한 CSS 파일 복사
+cp -n assets/css/style.css assets/css/style.css.bak 2>/dev/null || true
+cp -n assets/css/modern_style.css assets/css/modern_style.css.bak 2>/dev/null || true
+
 # 앱 실행
 streamlit run app.py

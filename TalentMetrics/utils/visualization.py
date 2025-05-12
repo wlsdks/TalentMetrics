@@ -3,6 +3,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import streamlit as st
+import numpy as np
+from scipy.stats import gaussian_kde
 
 def get_color_scheme(style):
     """
@@ -280,4 +282,177 @@ def create_heatmap(df, category_col, value_col, color_scheme):
         return fig
     except Exception as e:
         st.error(f"히트맵 생성 중 오류 발생: {str(e)}")
+        return None
+
+def create_trend_chart(trend_data, title="추세 분석"):
+    """
+    시계열 추세를 시각화합니다.
+    """
+    fig = go.Figure()
+    
+    if trend_data:
+        for period, data in trend_data.items():
+            fig.add_trace(go.Scatter(
+                x=data.index.astype(str),
+                y=data.values,
+                name=period,
+                mode='lines+markers'
+            ))
+    
+    fig.update_layout(
+        title=title,
+        xaxis_title="기간",
+        yaxis_title="값",
+        hovermode="x unified"
+    )
+    
+    return fig
+
+def create_outlier_chart(df, column, outliers):
+    """
+    이상치를 시각화합니다.
+    """
+    fig = go.Figure()
+    
+    # 정상 데이터
+    normal_data = df[~df.index.isin(outliers.index)]
+    fig.add_trace(go.Scatter(
+        x=normal_data.index,
+        y=normal_data[column],
+        mode='markers',
+        name='정상 데이터',
+        marker=dict(color='blue')
+    ))
+    
+    # 이상치
+    fig.add_trace(go.Scatter(
+        x=outliers.index,
+        y=outliers[column],
+        mode='markers',
+        name='이상치',
+        marker=dict(
+            color='red',
+            size=10,
+            symbol='x'
+        )
+    ))
+    
+    fig.update_layout(
+        title=f"{column} 이상치 분석",
+        xaxis_title="인덱스",
+        yaxis_title=column,
+        hovermode="closest"
+    )
+    
+    return fig
+
+def create_correlation_heatmap(df, numeric_columns):
+    """
+    수치형 열들 간의 상관관계를 히트맵으로 시각화합니다.
+    """
+    corr_matrix = df[numeric_columns].corr()
+    
+    fig = go.Figure(data=go.Heatmap(
+        z=corr_matrix,
+        x=corr_matrix.columns,
+        y=corr_matrix.columns,
+        colorscale='RdBu',
+        zmin=-1,
+        zmax=1
+    ))
+    
+    fig.update_layout(
+        title="상관관계 분석",
+        xaxis_title="변수",
+        yaxis_title="변수"
+    )
+    
+    return fig
+
+def create_distribution_chart(df, column, bins=30):
+    """
+    데이터의 분포를 시각화하는 히스토그램과 커널 밀도 추정을 생성합니다.
+    
+    Args:
+        df (pd.DataFrame): 데이터프레임
+        column (str): 분포를 시각화할 열 이름
+        bins (int): 히스토그램의 구간 수
+        
+    Returns:
+        plotly.graph_objects.Figure: 분포 차트
+    """
+    try:
+        # 기본 통계량 계산
+        mean_val = df[column].mean()
+        median_val = df[column].median()
+        std_val = df[column].std()
+        
+        # 히스토그램과 커널 밀도 추정 생성
+        fig = go.Figure()
+        
+        # 히스토그램 추가
+        fig.add_trace(go.Histogram(
+            x=df[column],
+            name='히스토그램',
+            nbinsx=bins,
+            opacity=0.7,
+            histnorm='probability density'
+        ))
+        
+        # 커널 밀도 추정 추가
+        kde_x = np.linspace(df[column].min(), df[column].max(), 100)
+        kde_y = df[column].plot.kde().get_lines()[0].get_ydata()
+        
+        fig.add_trace(go.Scatter(
+            x=kde_x,
+            y=kde_y,
+            name='커널 밀도',
+            line=dict(width=2)
+        ))
+        
+        # 평균선 추가
+        fig.add_vline(
+            x=mean_val,
+            line_dash="dash",
+            line_color="red",
+            annotation_text="평균",
+            annotation_position="top right"
+        )
+        
+        # 중앙값선 추가
+        fig.add_vline(
+            x=median_val,
+            line_dash="dash",
+            line_color="green",
+            annotation_text="중앙값",
+            annotation_position="top left"
+        )
+        
+        # 레이아웃 설정
+        fig.update_layout(
+            title=f"{column} 분포",
+            xaxis_title=column,
+            yaxis_title="밀도",
+            showlegend=True,
+            height=400,
+            annotations=[
+                dict(
+                    x=0.02,
+                    y=0.98,
+                    xref="paper",
+                    yref="paper",
+                    text=f"평균: {mean_val:.2f}<br>중앙값: {median_val:.2f}<br>표준편차: {std_val:.2f}",
+                    showarrow=False,
+                    bgcolor="rgba(255, 255, 255, 0.8)",
+                    bordercolor="black",
+                    borderwidth=1,
+                    borderpad=4
+                )
+            ]
+        )
+        
+        return fig
+    
+    except Exception as e:
+        st.error(f"분포 차트 생성 중 오류 발생: {str(e)}")
         return None

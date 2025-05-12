@@ -3,6 +3,8 @@ import pandas as pd
 import streamlit as st
 import numpy as np
 from io import BytesIO
+from datetime import datetime, timedelta
+import io
 
 def load_excel_file(uploaded_file):
     """
@@ -235,3 +237,109 @@ def create_demo_data():
     excel_buffer.seek(0)
     
     return excel_buffer
+
+def validate_data(df):
+    """
+    데이터프레임의 유효성을 검사합니다.
+    
+    Args:
+        df (pd.DataFrame): 검사할 데이터프레임
+        
+    Returns:
+        tuple: (is_valid, message)
+            - is_valid (bool): 데이터가 유효한지 여부
+            - message (str): 검증 결과 메시지
+    """
+    if df is None or df.empty:
+        return False, "데이터가 비어있습니다."
+    
+    # 필수 열 확인
+    required_columns = ['부서', '인원수']
+    missing_columns = [col for col in required_columns if col not in df.columns]
+    if missing_columns:
+        return False, f"필수 열이 누락되었습니다: {', '.join(missing_columns)}"
+    
+    # 데이터 타입 검사
+    if not pd.api.types.is_numeric_dtype(df['인원수']):
+        return False, "'인원수' 열은 숫자형이어야 합니다."
+    
+    # 음수 값 검사
+    if (df['인원수'] < 0).any():
+        return False, "인원수에 음수 값이 포함되어 있습니다."
+    
+    # 결측치 검사
+    missing_values = df.isnull().sum()
+    if missing_values.any():
+        return False, f"결측치가 있습니다:\n{missing_values[missing_values > 0]}"
+    
+    # 중복 행 검사
+    duplicates = df.duplicated().sum()
+    if duplicates > 0:
+        return False, f"중복된 행이 {duplicates}개 있습니다."
+    
+    return True, "데이터가 유효합니다."
+
+def preprocess_data(df):
+    """
+    데이터 전처리를 수행합니다.
+    """
+    if df is None or df.empty:
+        return None
+    
+    # 결측치 처리
+    df = df.fillna(method='ffill').fillna(method='bfill')
+    
+    # 중복 제거
+    df = df.drop_duplicates()
+    
+    # 문자열 데이터 정규화
+    for col in df.select_dtypes(include=['object']).columns:
+        df[col] = df[col].str.strip().str.lower()
+    
+    return df
+
+def detect_outliers(df, column):
+    """
+    특정 열의 이상치를 감지합니다.
+    """
+    if not pd.api.types.is_numeric_dtype(df[column]):
+        return []
+    
+    Q1 = df[column].quantile(0.25)
+    Q3 = df[column].quantile(0.75)
+    IQR = Q3 - Q1
+    
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    
+    outliers = df[(df[column] < lower_bound) | (df[column] > upper_bound)]
+    return outliers
+
+def calculate_trends(df, date_col, value_col):
+    """
+    시계열 데이터의 추세를 계산합니다.
+    """
+    if date_col not in df.columns or value_col not in df.columns:
+        return None
+    
+    try:
+        df[date_col] = pd.to_datetime(df[date_col])
+        df = df.sort_values(date_col)
+        
+        # 월별 추세
+        monthly_trend = df.groupby(df[date_col].dt.to_period('M'))[value_col].mean()
+        
+        # 분기별 추세
+        quarterly_trend = df.groupby(df[date_col].dt.to_period('Q'))[value_col].mean()
+        
+        # 연도별 추세
+        yearly_trend = df.groupby(df[date_col].dt.to_period('Y'))[value_col].mean()
+        
+        return {
+            'monthly': monthly_trend,
+            'quarterly': quarterly_trend,
+            'yearly': yearly_trend
+        }
+    except Exception as e:
+        st.error(f"추세 계산 중 오류 발생: {str(e)}")
+        return None
