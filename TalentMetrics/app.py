@@ -39,100 +39,230 @@ st.markdown("""
     /* 전체 앱 스타일 */
     .stApp {
         background-color: #f8f9fa;
+        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
     }
     
     /* 타이틀 스타일 */
     .main-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #1f2937;
+        font-size: 2.8rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
     }
     
     .sub-title {
-        font-size: 1.1rem;
-        color: #6b7280;
-        margin-bottom: 2rem;
+        font-size: 1.2rem;
+        color: #4b5563;
+        margin-bottom: 2.5rem;
+        font-weight: 400;
     }
     
     /* 카드 스타일 */
     .dashboard-card {
         background-color: white;
-        border-radius: 10px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        margin-bottom: 1.5rem;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        margin-bottom: 2rem;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        display: none;  /* 기본적으로 숨김 */
+    }
+    
+    .dashboard-card:has(> div:not(:empty)) {
+        display: block;  /* 내용이 있을 때만 표시 */
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
     
     /* 탭 스타일 */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 2rem;
+        gap: 2.5rem;
+        border-bottom: 2px solid #e5e7eb;
+        margin-bottom: 2rem;
     }
     
     .stTabs [data-baseweb="tab"] {
-        height: 50px;
+        height: 56px;
         white-space: pre-wrap;
-        background-color: #f8f9fa;
-        border-radius: 4px 4px 0 0;
+        background-color: transparent;
+        border-radius: 8px 8px 0 0;
         gap: 1rem;
-        padding-top: 10px;
-        padding-bottom: 10px;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+        color: #6b7280;
     }
     
     .stTabs [aria-selected="true"] {
-        background-color: white;
-        border-bottom: 2px solid #2563eb;
+        background-color: #2563eb;
+        color: white;
+        border-bottom: none;
     }
     
     /* 메트릭 스타일 */
     .metric-card {
-        background-color: white;
-        border-radius: 8px;
-        padding: 1rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s ease-in-out;
+        height: 100%;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
     
     .metric-value {
-        font-size: 1.5rem;
-        font-weight: 600;
+        font-size: 2rem;
+        font-weight: 700;
         color: #1f2937;
+        margin-bottom: 0.5rem;
     }
     
     .metric-label {
-        font-size: 0.875rem;
+        font-size: 0.95rem;
         color: #6b7280;
+        font-weight: 500;
     }
     
     /* 사이드바 스타일 */
     .css-1d391kg {
         background-color: white;
+        box-shadow: 4px 0 6px -1px rgba(0, 0, 0, 0.1);
     }
     
     /* 버튼 스타일 */
     .stButton>button {
-        background-color: #2563eb;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
         color: white;
-        border-radius: 6px;
-        padding: 0.5rem 1rem;
-        font-weight: 500;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        border: none;
+        transition: all 0.2s ease-in-out;
     }
     
     .stButton>button:hover {
-        background-color: #1d4ed8;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
     }
     
     /* 데이터프레임 스타일 */
     .dataframe {
-        border-radius: 8px;
+        border-radius: 12px;
         overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
     
     /* 푸터 스타일 */
     .footer {
         text-align: center;
-        padding: 2rem 0;
+        padding: 3rem 0;
         color: #6b7280;
-        font-size: 0.875rem;
+        font-size: 0.95rem;
+        border-top: 1px solid #e5e7eb;
+        margin-top: 4rem;
+    }
+    
+    /* 로딩 스피너 스타일 */
+    .stSpinner > div {
+        border-color: #2563eb;
+    }
+    
+    /* 차트 컨테이너 스타일 */
+    .chart-container {
+        background-color: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        display: none;  /* 기본적으로 숨김 */
+    }
+    
+    .chart-container:has(> div:not(:empty)) {
+        display: block;  /* 내용이 있을 때만 표시 */
+    }
+    
+    /* 빈 상태 스타일 */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        margin: 2rem 0;
+    }
+    
+    .empty-state h2 {
+        color: #1f2937;
+        margin-bottom: 1rem;
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+    
+    .empty-state p {
+        color: #6b7280;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+    }
+    
+    .empty-state .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .empty-state .feature-item {
+        background: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: left;
+    }
+    
+    .empty-state .feature-item h3 {
+        color: #2563eb;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    .empty-state .feature-item p {
+        color: #4b5563;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+    
+    /* 반응형 디자인 */
+    @media (max-width: 768px) {
+        .main-title {
+            font-size: 2rem;
+        }
+        
+        .sub-title {
+            font-size: 1rem;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+        }
+        
+        .dashboard-card {
+            padding: 1.5rem;
+        }
+        
+        .empty-state .features {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -664,18 +794,26 @@ def main():
     else:
         # 빈 상태 표시
         st.markdown("""
-        <div style="text-align: center; padding: 4rem 2rem;">
-            <h2 style="color: #1f2937; margin-bottom: 1rem;">TalentMetrics에 오신 것을 환영합니다</h2>
-            <p style="color: #6b7280; margin-bottom: 2rem;">채용 데이터를 업로드하여 인사이트를 발견하세요</p>
-            <div style="background-color: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                <h3 style="color: #2563eb; margin-bottom: 1rem;">시작하기</h3>
-                <p style="color: #4b5563; margin-bottom: 1.5rem;">왼쪽 사이드바에서 Excel 파일을 업로드하세요</p>
-                <ul style="text-align: left; color: #6b7280; margin-bottom: 1.5rem;">
-                    <li>채용 현황 분석</li>
-                    <li>부서별 비교</li>
-                    <li>추세 분석</li>
-                    <li>고급 인사이트</li>
-                </ul>
+        <div class="empty-state">
+            <h2>TalentMetrics에 오신 것을 환영합니다</h2>
+            <p>채용 데이터를 업로드하여 인사이트를 발견하세요</p>
+            <div class="features">
+                <div class="feature-item">
+                    <h3>📊 채용 현황 분석</h3>
+                    <p>부서별 채용 현황을 한눈에 파악하고 분석하세요</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🔄 부서별 비교</h3>
+                    <p>다양한 지표를 기반으로 부서 간 비교 분석을 수행하세요</p>
+                </div>
+                <div class="feature-item">
+                    <h3>📈 추세 분석</h3>
+                    <p>시간에 따른 채용 추세를 파악하고 예측하세요</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🔍 고급 인사이트</h3>
+                    <p>데이터 기반의 스마트한 채용 의사결정을 내리세요</p>
+                </div>
             </div>
         </div>
         """, unsafe_allow_html=True)
