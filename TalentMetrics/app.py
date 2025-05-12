@@ -26,19 +26,121 @@ from utils.ui import (
 )
 
 # 페이지 설정
-set_page_config()
+st.set_page_config(
+    page_title="TalentMetrics - HR 채용 대시보드",
+    page_icon="📊",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-# CSS 로드
-load_css()
+# 커스텀 CSS
+st.markdown("""
+<style>
+    /* 전체 앱 스타일 */
+    .stApp {
+        background-color: #f8f9fa;
+    }
+    
+    /* 타이틀 스타일 */
+    .main-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .sub-title {
+        font-size: 1.1rem;
+        color: #6b7280;
+        margin-bottom: 2rem;
+    }
+    
+    /* 카드 스타일 */
+    .dashboard-card {
+        background-color: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+    }
+    
+    /* 탭 스타일 */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 2rem;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
+        white-space: pre-wrap;
+        background-color: #f8f9fa;
+        border-radius: 4px 4px 0 0;
+        gap: 1rem;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background-color: white;
+        border-bottom: 2px solid #2563eb;
+    }
+    
+    /* 메트릭 스타일 */
+    .metric-card {
+        background-color: white;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+    
+    .metric-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    /* 사이드바 스타일 */
+    .css-1d391kg {
+        background-color: white;
+    }
+    
+    /* 버튼 스타일 */
+    .stButton>button {
+        background-color: #2563eb;
+        color: white;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+    }
+    
+    .stButton>button:hover {
+        background-color: #1d4ed8;
+    }
+    
+    /* 데이터프레임 스타일 */
+    .dataframe {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    /* 푸터 스타일 */
+    .footer {
+        text-align: center;
+        padding: 2rem 0;
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # 타이틀
-st.title("TalentMetrics - HR 채용 대시보드")
 st.markdown("""
-<div style="margin-bottom: 20px;">
-    <span style="color: #6b7280; font-size: 1rem;">
-        채용 데이터를 시각화하고 핵심 인사이트를 발견하세요
-    </span>
-</div>
+<div class="main-title">TalentMetrics - HR 채용 대시보드</div>
+<div class="sub-title">채용 데이터를 시각화하고 핵심 인사이트를 발견하세요</div>
 """, unsafe_allow_html=True)
 
 # 메인 앱 로직
@@ -209,10 +311,45 @@ def main():
             tab1, tab2, tab3, tab4 = st.tabs(["📈 부서별 분석", "🔍 상세 분석", "🔄 비교 분석", "📊 고급 분석"])
             
             with tab1:
+                st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
                 st.subheader("부서별 채용 현황")
                 
                 # 상단 요약 통계
-                render_metrics(summary, category_col, value_col)
+                col1, col2, col3, col4 = st.columns(4)
+                
+                with col1:
+                    st.markdown(f"""
+                    <div class="metric-card">
+                        <div class="metric-value">{summary['total_value']:,.0f}</div>
+                        <div class="metric-label">총 채용 인원</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with col2:
+                    st.markdown(f"""
+                    <div class="metric-card">
+                        <div class="metric-value">{summary['avg_value']:,.1f}</div>
+                        <div class="metric-label">평균 채용 인원</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with col3:
+                    st.markdown(f"""
+                    <div class="metric-card">
+                        <div class="metric-value">{summary['max_category'].get(value_col, 0):,.0f}</div>
+                        <div class="metric-label">최대 채용 인원</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with col4:
+                    st.markdown(f"""
+                    <div class="metric-card">
+                        <div class="metric-value">{summary['min_category'].get(value_col, 0):,.0f}</div>
+                        <div class="metric-label">최소 채용 인원</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                st.markdown('</div>', unsafe_allow_html=True)
                 
                 # 차트 행 1
                 col1, col2 = st.columns(2)
@@ -515,14 +652,33 @@ def main():
                         st.plotly_chart(create_trend_chart(trends))
             
             # 푸터
-            st.markdown("---")
-            st.caption("© 2025 TalentMetrics - HR 채용 대시보드 v2.0")
+            st.markdown("""
+            <div class="footer">
+                <p>© 2025 TalentMetrics - HR 채용 대시보드 v2.0</p>
+                <p style="font-size: 0.8rem; color: #9ca3af;">데이터 기반의 스마트한 채용 의사결정을 위한 솔루션</p>
+            </div>
+            """, unsafe_allow_html=True)
             
         else:
             st.error("선택한 열에서 데이터를 처리하는 데 문제가 발생했습니다. 다른 열을 선택해 보세요.")
     else:
         # 빈 상태 표시
-        render_empty_state()
+        st.markdown("""
+        <div style="text-align: center; padding: 4rem 2rem;">
+            <h2 style="color: #1f2937; margin-bottom: 1rem;">TalentMetrics에 오신 것을 환영합니다</h2>
+            <p style="color: #6b7280; margin-bottom: 2rem;">채용 데이터를 업로드하여 인사이트를 발견하세요</p>
+            <div style="background-color: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <h3 style="color: #2563eb; margin-bottom: 1rem;">시작하기</h3>
+                <p style="color: #4b5563; margin-bottom: 1.5rem;">왼쪽 사이드바에서 Excel 파일을 업로드하세요</p>
+                <ul style="text-align: left; color: #6b7280; margin-bottom: 1.5rem;">
+                    <li>채용 현황 분석</li>
+                    <li>부서별 비교</li>
+                    <li>추세 분석</li>
+                    <li>고급 인사이트</li>
+                </ul>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
