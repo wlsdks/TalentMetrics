@@ -38,16 +38,39 @@ def create_bar_chart(df, category_col, value_col, color_scheme, title=""):
         title=title
     )
     
+    # 모던한 디자인 적용
     fig.update_layout(
         height=400,
         margin=dict(l=20, r=20, t=30, b=20),
-        coloraxis_showscale=False
+        coloraxis_showscale=False,
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(family="Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif"),
+        title=dict(
+            font=dict(size=20, color='#1f2937'),
+            x=0.5,
+            y=0.95
+        ),
+        xaxis=dict(
+            showgrid=False,
+            zeroline=False,
+            tickfont=dict(size=12, color='#6b7280')
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridcolor='rgba(0,0,0,0.1)',
+            zeroline=False,
+            tickfont=dict(size=12, color='#6b7280')
+        ),
+        bargap=0.15
     )
     
     # 바 위에 값 표시
     fig.update_traces(
-        texttemplate='%{y}',
-        textposition='outside'
+        selector=dict(type='bar'),
+        texttemplate='%{y:,.0f}',
+        textposition='outside',
+        hovertemplate='<b>%{x}</b><br><span style="color:#2563eb;font-weight:bold;">%{y:,.0f}</span><extra></extra>'
     )
     
     return fig
@@ -70,18 +93,41 @@ def create_pie_chart(df, category_col, value_col, color_scheme, title=""):
             names=category_col,
             values=value_col,
             color_discrete_sequence=color_scheme if isinstance(color_scheme, list) else None,
-            hole=0.4,
+            hole=0.6,
             title=title
         )
         
+        # 모던한 디자인 적용
         fig.update_layout(
             height=400,
-            margin=dict(l=20, r=20, t=30, b=20)
+            margin=dict(l=20, r=20, t=30, b=20),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(family="Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif"),
+            title=dict(
+                text=title,
+                font=dict(size=20, color='#1f2937'),
+                x=0.5,
+                y=0.95
+            ),
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=-0.2,
+                xanchor="center",
+                x=0.5,
+                font=dict(size=12, color='#6b7280')
+            )
         )
         
         fig.update_traces(
+            selector=dict(type='pie'),
             textposition='inside',
-            textinfo='percent+label'
+            insidetextorientation='radial',
+            textinfo='label+percent',
+            textfont=dict(size=14, color='#1f2937', family="Pretendard, -apple-system, system-ui"),
+            marker=dict(line=dict(color='white', width=2)),
+            hovertemplate='<b>%{label}</b><br>%{value:,.0f} (%{percent})<extra></extra>'
         )
         
         return fig
@@ -97,10 +143,6 @@ def create_treemap(df, category_col, value_col, color_scheme, title=""):
         return None
     
     try:
-        # 데이터 확인 및 디버깅
-        st.write("트리맵 데이터 확인:", df.head(2))
-        st.write(f"카테고리 열: {category_col}, 값 열: {value_col}")
-        
         # 데이터 복사 및 타입 변환
         chart_df = df.copy()
         chart_df[category_col] = chart_df[category_col].astype(str)
@@ -111,34 +153,34 @@ def create_treemap(df, category_col, value_col, color_scheme, title=""):
         fig.add_trace(go.Treemap(
             labels=chart_df[category_col].tolist(),
             values=chart_df[value_col].tolist(),
-            parents=[""] * len(chart_df),  # 모든 항목이 루트에 직접 연결
+            parents=[""] * len(chart_df),
             marker=dict(
                 colors=chart_df[value_col].tolist(),
-                colorscale="Blues"
+                colorscale="Blues",
+                line=dict(width=0)
             ),
-            textinfo="label+value"
+            textinfo="label+value+percent parent",
+            textfont=dict(size=12, color='#1f2937')
         ))
         
+        # 모던한 디자인 적용
         fig.update_layout(
             height=500,
             margin=dict(l=20, r=20, t=30, b=20),
-            title=title
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(family="Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif"),
+            title=dict(
+                font=dict(size=20, color='#1f2937'),
+                x=0.5,
+                y=0.95
+            )
         )
         
         return fig
     except Exception as e:
         st.error(f"트리맵 생성 중 오류 발생: {str(e)}")
-        # 오류 발생 시 간단한 막대 차트로 대체
-        try:
-            simple_fig = px.bar(
-                df,
-                x=category_col,
-                y=value_col,
-                title=title + " (트리맵 생성 실패, 막대 차트로 대체)"
-            )
-            return simple_fig
-        except:
-            return None
+        return None
 
 def create_comparison_chart(data, category_col, value_col, color_scheme):
     """
@@ -154,7 +196,7 @@ def create_comparison_chart(data, category_col, value_col, color_scheme):
             value_col: [data["category1"]["value"], data["category2"]["value"]]
         })
         
-        colors = [color_scheme[1], color_scheme[5]] if isinstance(color_scheme, list) and len(color_scheme) > 5 else ["blue", "orange"]
+        colors = [color_scheme[1], color_scheme[5]] if isinstance(color_scheme, list) and len(color_scheme) > 5 else ["#2563eb", "#1d4ed8"]
         
         fig = px.bar(
             compare_df,
@@ -165,15 +207,33 @@ def create_comparison_chart(data, category_col, value_col, color_scheme):
             color_discrete_sequence=colors
         )
         
+        # 모던한 디자인 적용
         fig.update_layout(
             height=400,
             margin=dict(l=20, r=20, t=30, b=20),
-            showlegend=False
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(family="Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif"),
+            showlegend=False,
+            xaxis=dict(
+                showgrid=False,
+                zeroline=False,
+                tickfont=dict(size=12, color='#6b7280')
+            ),
+            yaxis=dict(
+                showgrid=True,
+                gridcolor='rgba(0,0,0,0.1)',
+                zeroline=False,
+                tickfont=dict(size=12, color='#6b7280')
+            )
         )
         
         fig.update_traces(
-            texttemplate='%{text}',
-            textposition='outside'
+            texttemplate='%{text:,.0f}',
+            textposition='outside',
+            marker=dict(
+                line=dict(width=0)
+            )
         )
         
         return fig
@@ -205,14 +265,17 @@ def create_bullet_chart(df, category_col, value_col, avg_value, color_scheme):
             value = row[value_col]
             
             color_idx = i % len(color_scheme) if isinstance(color_scheme, list) else 0
-            bar_color = color_scheme[color_idx] if isinstance(color_scheme, list) else "blue"
+            bar_color = color_scheme[color_idx] if isinstance(color_scheme, list) else "#2563eb"
             
             fig.add_trace(go.Bar(
                 y=[category],
                 x=[value],
                 orientation='h',
                 name=category,
-                marker=dict(color=bar_color),
+                marker=dict(
+                    color=bar_color,
+                    line=dict(width=0)
+                ),
                 showlegend=False
             ))
         
@@ -230,11 +293,24 @@ def create_bullet_chart(df, category_col, value_col, avg_value, color_scheme):
             )
         ))
         
+        # 모던한 디자인 적용
         fig.update_layout(
-            height=max(350, len(chart_df) * 30),  # 데이터 수에 따라 높이 조정
+            height=max(350, len(chart_df) * 30),
             margin=dict(l=20, r=20, t=30, b=20),
-            xaxis_title=value_col,
-            yaxis_title=category_col
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(family="Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif"),
+            xaxis=dict(
+                showgrid=True,
+                gridcolor='rgba(0,0,0,0.1)',
+                zeroline=False,
+                tickfont=dict(size=12, color='#6b7280')
+            ),
+            yaxis=dict(
+                showgrid=False,
+                zeroline=False,
+                tickfont=dict(size=12, color='#6b7280')
+            )
         )
         
         return fig, is_truncated
@@ -262,7 +338,7 @@ def create_heatmap(df, category_col, value_col, color_scheme):
         if isinstance(color_scheme, list) and len(color_scheme) >= 3:
             colorscale = [[0, color_scheme[0]], [0.5, color_scheme[len(color_scheme)//2]], [1, color_scheme[-1]]]
         else:
-            colorscale = [[0, "lightblue"], [0.5, "blue"], [1, "darkblue"]]
+            colorscale = [[0, "#e0f2fe"], [0.5, "#3b82f6"], [1, "#1e40af"]]
         
         fig = go.Figure(go.Heatmap(
             z=[values],
@@ -270,13 +346,30 @@ def create_heatmap(df, category_col, value_col, color_scheme):
             colorscale=colorscale,
             zmin=min_val,
             zmax=max_val,
-            showscale=True
+            showscale=True,
+            text=[[f"{v:,.0f}" for v in values]],
+            texttemplate="%{text}",
+            textfont=dict(size=12, color='#1f2937')
         ))
         
+        # 모던한 디자인 적용
         fig.update_layout(
             height=300,
             margin=dict(l=20, r=20, t=30, b=80),
-            xaxis=dict(tickangle=-45)
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(family="Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif"),
+            xaxis=dict(
+                tickangle=-45,
+                tickfont=dict(size=12, color='#6b7280')
+            ),
+            coloraxis_colorbar=dict(
+                title=dict(
+                    text=value_col,
+                    font=dict(size=12, color='#6b7280')
+                ),
+                tickfont=dict(size=12, color='#6b7280')
+            )
         )
         
         return fig
