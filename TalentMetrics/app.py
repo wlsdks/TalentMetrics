@@ -442,7 +442,6 @@ def main():
             
             with tab1:
                 st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-                st.subheader("부서별 채용 현황")
                 
                 # 상단 요약 통계
                 col1, col2, col3, col4 = st.columns(4)

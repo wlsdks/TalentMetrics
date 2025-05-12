@@ -324,39 +324,43 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
     st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
     st.subheader("📈 HR 핵심 지표")
     
-    # 기본 지표
-    col1, col2, col3, col4 = st.columns(4)
-    
+    # HR 핵심 지표를 박스 형태로 스타일링
+    col1, col2, col3, col4 = st.columns(4, gap="large")
+
     with col1:
-        st.metric(
-            "총 인력",
-            f"{hr_metrics.get('total_headcount', 0):,.0f}명",
-            delta=f"{hr_metrics.get('total_headcount', 0) - hr_metrics.get('avg_headcount', 0):,.0f}명"
-        )
-    
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-label">총 인력</div>
+            <div class="metric-value">{:,}명</div>
+        </div>
+        """.format(hr_metrics.get('total_headcount', 0)), unsafe_allow_html=True)
+
     with col2:
-        st.metric(
-            "평균 인력",
-            f"{hr_metrics.get('avg_headcount', 0):,.1f}명",
-            delta=f"{hr_metrics.get('avg_headcount', 0) - hr_metrics.get('min_headcount', 0):,.1f}명"
-        )
-    
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-label">평균 인력</div>
+            <div class="metric-value">{:.1f}명</div>
+        </div>
+        """.format(hr_metrics.get('avg_headcount', 0)), unsafe_allow_html=True)
+
     with col3:
         if 'total_budget' in hr_metrics:
-            st.metric(
-                "총 예산",
-                f"{hr_metrics['total_budget']:,.0f}원",
-                f"인당 {hr_metrics.get('avg_cost_per_head', 0):,.0f}원"
-            )
-    
+            st.markdown("""
+            <div class="metric-card">
+                <div class="metric-label">총 예산</div>
+                <div class="metric-value">{:,}원</div>
+            </div>
+            """.format(hr_metrics['total_budget']), unsafe_allow_html=True)
+
     with col4:
         if 'yearly_growth_rates' in hr_metrics:
             latest_growth = list(hr_metrics['yearly_growth_rates'].values())[-1]
-            st.metric(
-                "연간 성장률",
-                f"{latest_growth:.1f}%",
-                delta=f"{latest_growth - list(hr_metrics['yearly_growth_rates'].values())[-2]:.1f}%"
-            )
+            st.markdown("""
+            <div class="metric-card">
+                <div class="metric-label">연간 성장률</div>
+                <div class="metric-value">{:.1f}%</div>
+            </div>
+            """.format(latest_growth), unsafe_allow_html=True)
     
     # 성별 분포
     if 'gender_distribution' in hr_metrics:
@@ -427,8 +431,6 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
         )
         
         st.plotly_chart(fig, use_container_width=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
 
 def render_enhanced_comparison_section(df, category_col, value_col, comparison_data, comparison_chart, hr_metrics):
     """
