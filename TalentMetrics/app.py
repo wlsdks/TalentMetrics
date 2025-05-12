@@ -59,7 +59,7 @@ def main():
                         # 모든 열 목록
                         all_columns = df.columns.tolist()
                         
-                        # 사용자 정의 키를 사용하여 selectbox 생성
+                        # 카테고리 열 선택
                         category_col = st.selectbox(
                             "부서/카테고리 열 선택",
                             all_columns,
@@ -67,13 +67,28 @@ def main():
                         )
                         config["category_col"] = category_col
                         
+                        # 카테고리 열을 제외한 나머지 열들
+                        remaining_cols = [col for col in all_columns if col != category_col]
+                        
+                        # 값 열 선택 (숫자형 데이터만)
+                        numeric_cols = df.select_dtypes(include=['number']).columns.tolist()
+                        # 만약 숫자형 열이 없으면 나머지 모든 열 사용
+                        if not numeric_cols:
+                            numeric_cols = remaining_cols
+                        
                         # 값 열 선택
                         value_col = st.selectbox(
                             "인원수/값 열 선택",
-                            all_columns,
+                            numeric_cols,
                             key="value_col_select"
                         )
                         config["value_col"] = value_col
+                        
+                        # 값 선택 검증
+                        if category_col == value_col:
+                            st.error("카테고리 열과 값 열은 서로 다른 열이어야 합니다.")
+                            category_col = None
+                            value_col = None
                         
                         # 대시보드 스타일 선택
                         st.subheader("대시보드 스타일")

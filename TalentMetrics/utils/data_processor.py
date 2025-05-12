@@ -63,6 +63,11 @@ def process_data(df, category_col, value_col):
         st.error(f"선택한 열({category_col} 또는 {value_col})이 데이터프레임에 존재하지 않습니다.")
         return None
     
+    # 카테고리 열과 값 열이 같은지 검증
+    if category_col == value_col:
+        st.error("카테고리 열과 값 열이 동일합니다. 서로 다른 열을 선택해주세요.")
+        return None
+    
     try:
         # 데이터 확인
         st.info(f"열 정보: {category_col}(유형: {df[category_col].dtype}), {value_col}(유형: {df[value_col].dtype})")
@@ -76,10 +81,19 @@ def process_data(df, category_col, value_col):
             # 각 카테고리별로 값들을 필터링하고 합계 계산
             cat_values = df[df[category_col].astype(str) == cat][value_col]
             if not cat_values.empty:
-                result_data.append({
-                    category_col: cat,
-                    value_col: cat_values.sum()
-                })
+                # 값이 숫자형인지 확인
+                try:
+                    sum_value = pd.to_numeric(cat_values, errors='coerce').sum()
+                    result_data.append({
+                        category_col: cat,
+                        value_col: sum_value
+                    })
+                except:
+                    # 숫자로 변환할 수 없는 경우 개수 사용
+                    result_data.append({
+                        category_col: cat,
+                        value_col: len(cat_values)
+                    })
         
         # 새 데이터프레임 생성
         result_df = pd.DataFrame(result_data)
@@ -102,20 +116,39 @@ def calculate_summary(df, value_col):
     데이터의 요약 통계를 계산합니다.
     """
     if df is None or df.empty or value_col not in df.columns:
-        return {}
+        return {
+            "total_categories": 0,
+            "total_value": 0,
+            "avg_value": 0,
+            "median_value": 0,
+            "max_category": {},
+            "min_category": {}
+        }
     
     try:
+        # 기본 통계 계산
         total_categories = len(df)
-        total_value = df[value_col].sum()
-        avg_value = df[value_col].mean()
-        median_value = df[value_col].median()
         
-        # 최대값과 최소값 (행 기준)
-        max_row = df.loc[df[value_col].idxmax()]
-        min_row = df.loc[df[value_col].idxmin()]
-        
-        max_category = max_row.to_dict()
-        min_category = min_row.to_dict()
+        # 값 열이 숫자형인지 확인
+        if pd.api.types.is_numeric_dtype(df[value_col]):
+            total_value = df[value_col].sum()
+            avg_value = df[value_col].mean()
+            median_value = df[value_col].median()
+            
+            # 최대/최소값 찾기
+            max_idx = df[value_col].idxmax()
+            min_idx = df[value_col].idxmin()
+            
+            max_category = df.loc[max_idx].to_dict()
+            min_category = df.loc[min_idx].to_dict()
+        else:
+            # 숫자형이 아닌 경우 기본값 사용
+            st.warning(f"{value_col} 열이 숫자형이 아니어서 통계를 계산할 수 없습니다.")
+            total_value = 0
+            avg_value = 0
+            median_value = 0
+            max_category = {}
+            min_category = {}
         
         return {
             "total_categories": total_categories,
@@ -128,7 +161,7 @@ def calculate_summary(df, value_col):
     except Exception as e:
         st.error(f"요약 통계 계산 중 오류 발생: {str(e)}")
         return {
-            "total_categories": len(df) if df is not None else 0,
+            "total_categories": total_categories if 'total_categories' in locals() else 0,
             "total_value": 0,
             "avg_value": 0,
             "median_value": 0,
