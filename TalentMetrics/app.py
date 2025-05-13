@@ -29,17 +29,40 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 모던 스타일 적용
+# 내장 CSS 스타일 (기본 스타일시트 외 인라인 스타일)
 st.markdown("""
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
-    
+    /* 깔끔한 모던 스타일 적용 */
     :root {
-        --primary-color: #4f46e5;
-        --primary-light: #818cf8;
-        --primary-dark: #3730a3;
-        --secondary-color: #f43f5e;
+        /* 기본 색상 팔레트 */
+        --primary-50: #eef2ff;
+        --primary-100: #e0e7ff;
+        --primary-200: #c7d2fe;
+        --primary-300: #a5b4fc;
+        --primary-400: #818cf8;
+        --primary-500: #6366f1;
+        --primary-600: #4f46e5;
+        --primary-700: #4338ca;
+        --primary-800: #3730a3;
+        --primary-900: #312e81;
+        --primary-950: #1e1b4b;
+        
+        --success-50: #ecfdf5;
+        --success-100: #d1fae5;
+        --success-500: #10b981;
+        --success-700: #047857;
+        
+        --danger-50: #fef2f2;
+        --danger-100: #fee2e2;
+        --danger-500: #ef4444;
+        --danger-700: #b91c1c;
+        
+        --warning-50: #fffbeb;
+        --warning-100: #fef3c7;
+        --warning-500: #f59e0b;
+        --warning-700: #b45309;
+        
         --neutral-50: #fafafa;
         --neutral-100: #f5f5f5;
         --neutral-200: #e5e5e5;
@@ -50,26 +73,24 @@ st.markdown("""
         --neutral-700: #404040;
         --neutral-800: #262626;
         --neutral-900: #171717;
-        --success-color: #10b981;
-        --warning-color: #f59e0b;
-        --danger-color: #ef4444;
-        --info-color: #3b82f6;
+        
+        /* 그림자 */
         --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        --transition-all: all 0.3s ease;
     }
     
-    .stApp {
-        font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    /* 메인 스타일링 */
+    body, .stApp {
+        font-family: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
         background-color: var(--neutral-50);
     }
     
     /* 스크롤바 스타일 */
     ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 6px;
+        height: 6px;
     }
     
     ::-webkit-scrollbar-track {
@@ -86,41 +107,18 @@ st.markdown("""
         background: var(--neutral-400);
     }
     
-    /* 메인 타이틀 스타일 */
-    .main-title {
-        font-size: 2.5rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0.25rem;
-        letter-spacing: -0.02em;
-        line-height: 1.2;
-    }
-    
-    .sub-title {
-        font-size: 1.1rem;
-        color: var(--neutral-600);
-        margin-bottom: 2rem;
-        font-weight: 400;
-        letter-spacing: -0.01em;
-    }
-    
-    /* 헤더 컨테이너 스타일 */
+    /* 헤더 스타일링 */
     .header-container {
-        background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+        background: linear-gradient(120deg, var(--primary-600), var(--primary-800));
         color: white;
-        padding: 1.5rem 2rem;
-        border-radius: 0.5rem;
+        padding: 1.75rem 2rem;
+        border-radius: 0.75rem;
         margin-bottom: 2rem;
         box-shadow: var(--shadow-lg);
-        transition: var(--transition-all);
         position: relative;
         overflow: hidden;
-    }
-    
-    .header-container:hover {
-        box-shadow: var(--shadow-xl);
+        display: flex;
+        align-items: center;
     }
     
     .header-container::before {
@@ -138,9 +136,35 @@ st.markdown("""
     .header-content {
         position: relative;
         z-index: 2;
+        flex-grow: 1;
     }
     
-    /* 카드 스타일 */
+    .header-icon {
+        font-size: 2.5rem;
+        margin-right: 1.5rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .main-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+        background: linear-gradient(to right, white, rgba(255, 255, 255, 0.8));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .sub-title {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0;
+        font-weight: 400;
+        letter-spacing: -0.01em;
+    }
+    
+    /* 카드 스타일링 */
     .dashboard-card {
         background-color: white;
         border-radius: 0.75rem;
@@ -148,7 +172,8 @@ st.markdown("""
         box-shadow: var(--shadow-md);
         margin-bottom: 1.5rem;
         border: 1px solid var(--neutral-200);
-        transition: var(--transition-all);
+        transition: all 0.3s ease;
+        position: relative;
         overflow: hidden;
     }
     
@@ -157,14 +182,30 @@ st.markdown("""
         transform: translateY(-2px);
     }
     
-    /* 메트릭 카드 스타일 */
+    .dashboard-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(to right, var(--primary-600), var(--primary-400));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .dashboard-card:hover::before {
+        opacity: 1;
+    }
+    
+    /* 메트릭 카드 스타일링 */
     .metric-card {
         background-color: white;
-        border-radius: 0.5rem;
+        border-radius: 0.75rem;
         padding: 1.25rem;
         box-shadow: var(--shadow-sm);
         text-align: center;
-        transition: var(--transition-all);
+        transition: all 0.3s ease;
         border: 1px solid var(--neutral-200);
         height: 100%;
         position: relative;
@@ -178,24 +219,39 @@ st.markdown("""
         left: 0;
         width: 100%;
         height: 4px;
-        background: linear-gradient(to right, var(--primary-color), var(--primary-light));
+        background: linear-gradient(to right, var(--primary-600), var(--primary-300));
         opacity: 0.7;
-        transition: var(--transition-all);
+        transition: opacity 0.3s ease;
     }
     
     .metric-card:hover {
         transform: translateY(-4px);
         box-shadow: var(--shadow-md);
+        border-color: var(--primary-200);
     }
     
     .metric-card:hover::before {
         opacity: 1;
     }
     
+    .metric-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        margin: 0 auto 0.75rem;
+        background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+        border-radius: 50%;
+        color: white;
+        font-size: 1.25rem;
+        box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2);
+    }
+    
     .metric-value {
         font-size: 2rem;
         font-weight: 700;
-        color: var(--primary-color);
+        color: var(--primary-700);
         margin-bottom: 0.5rem;
         line-height: 1.2;
     }
@@ -212,45 +268,63 @@ st.markdown("""
         color: var(--neutral-500);
     }
     
-    /* 버튼 스타일 */
+    /* 버튼 스타일링 */
     .stButton > button {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
         color: white;
         border-radius: 0.375rem;
         border: none;
         padding: 0.75rem 1.5rem;
         font-weight: 600;
-        transition: var(--transition-all);
-        font-family: 'Noto Sans KR', sans-serif;
+        transition: all 0.3s ease;
+        font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
         box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
     }
     
     .stButton > button:hover {
-        background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+        background: linear-gradient(135deg, var(--primary-700), var(--primary-600));
         transform: translateY(-2px);
         box-shadow: var(--shadow-md);
     }
     
-    /* 다운로드 버튼 스타일 */
+    .stButton > button::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transform: translateX(-100%);
+        transition: transform 0.6s;
+    }
+    
+    .stButton > button:hover::after {
+        transform: translateX(100%);
+    }
+    
+    /* 다운로드 버튼 스타일링 */
     .stDownloadButton > button {
-        background: linear-gradient(135deg, var(--success-color), #069668);
+        background: linear-gradient(135deg, var(--success-500), #069668);
         color: white;
         border-radius: 0.375rem;
         border: none;
         padding: 0.75rem 1.5rem;
         font-weight: 600;
-        transition: var(--transition-all);
-        font-family: 'Noto Sans KR', sans-serif;
+        transition: all 0.3s ease;
+        font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
         box-shadow: var(--shadow-sm);
     }
     
     .stDownloadButton > button:hover {
-        background: linear-gradient(135deg, #069668, var(--success-color));
+        background: linear-gradient(135deg, #069668, var(--success-500));
         transform: translateY(-2px);
         box-shadow: var(--shadow-md);
     }
     
-    /* 탭 스타일 */
+    /* 탭 스타일링 */
     .stTabs [data-baseweb="tab-list"] {
         gap: 0.75rem;
         background-color: transparent;
@@ -266,24 +340,24 @@ st.markdown("""
         border-bottom: none;
         color: var(--neutral-600);
         font-weight: 500;
-        transition: var(--transition-all);
-        font-family: 'Noto Sans KR', sans-serif;
+        transition: all 0.3s ease;
+        font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
     }
     
     .stTabs [data-baseweb="tab"]:hover {
         background-color: var(--neutral-50);
-        color: var(--primary-color);
+        color: var(--primary-600);
     }
     
     .stTabs [aria-selected="true"] {
         background-color: white !important;
-        color: var(--primary-color) !important;
+        color: var(--primary-600) !important;
         font-weight: 600;
-        border-top: 3px solid var(--primary-color);
+        border-top: 3px solid var(--primary-600);
         box-shadow: var(--shadow-sm);
     }
     
-    /* 데이터프레임 스타일 */
+    /* 데이터프레임 스타일링 */
     .dataframe {
         border-collapse: separate;
         border-spacing: 0;
@@ -299,7 +373,7 @@ st.markdown("""
         padding: 1rem;
         text-align: left;
         font-weight: 600;
-        color: var(--primary-dark);
+        color: var(--primary-800);
         border-bottom: 2px solid var(--neutral-300);
         position: sticky;
         top: 0;
@@ -309,7 +383,7 @@ st.markdown("""
     .dataframe td {
         padding: 0.75rem 1rem;
         border-bottom: 1px solid var(--neutral-200);
-        transition: var(--transition-all);
+        transition: all 0.3s ease;
     }
     
     .dataframe tr:hover td {
@@ -320,7 +394,59 @@ st.markdown("""
         border-bottom: none;
     }
     
-    /* 푸터 스타일 */
+    /* 인사이트 박스 스타일링 */
+    .insight-box {
+        background-color: var(--neutral-50);
+        border-left: 4px solid var(--primary-600);
+        padding: 1rem;
+        border-radius: 0.375rem;
+        margin-bottom: 1.25rem;
+        transition: all 0.3s ease;
+    }
+    
+    .insight-box:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateX(2px);
+    }
+    
+    /* 추세 표시 스타일링 */
+    .positive-trend {
+        color: var(--success-500);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .positive-trend::before {
+        content: '↑';
+    }
+    
+    .negative-trend {
+        color: var(--danger-500);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .negative-trend::before {
+        content: '↓';
+    }
+    
+    .neutral-trend {
+        color: var(--neutral-500);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .neutral-trend::before {
+        content: '→';
+    }
+    
+    /* 푸터 스타일링 */
     .footer {
         text-align: center;
         padding: 2.5rem 0;
@@ -349,6 +475,13 @@ st.markdown("""
         animation: fadeIn 0.6s ease-out;
     }
     
+    /* 스태거드 애니메이션 효과 */
+    .staggered-item:nth-child(1) { animation-delay: 0.1s; }
+    .staggered-item:nth-child(2) { animation-delay: 0.2s; }
+    .staggered-item:nth-child(3) { animation-delay: 0.3s; }
+    .staggered-item:nth-child(4) { animation-delay: 0.4s; }
+    .staggered-item:nth-child(5) { animation-delay: 0.5s; }
+    
     /* 빈 상태 스타일링 */
     .empty-state {
         text-align: center;
@@ -361,7 +494,7 @@ st.markdown("""
     
     .empty-state h2 {
         font-size: 1.8rem;
-        color: var(--primary-color);
+        color: var(--primary-600);
         margin-bottom: 1rem;
         font-weight: 700;
     }
@@ -383,8 +516,10 @@ st.markdown("""
         background-color: var(--neutral-50);
         padding: 1.25rem;
         border-radius: 0.5rem;
-        transition: var(--transition-all);
+        transition: all 0.3s ease;
         border: 1px solid var(--neutral-200);
+        position: relative;
+        overflow: hidden;
     }
     
     .feature-item:hover {
@@ -393,9 +528,25 @@ st.markdown("""
         background-color: white;
     }
     
+    .feature-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary-600), var(--primary-400));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .feature-item:hover::before {
+        opacity: 1;
+    }
+    
     .feature-item h3 {
         font-size: 1.2rem;
-        color: var(--primary-color);
+        color: var(--primary-600);
         margin-bottom: 0.5rem;
         font-weight: 600;
     }
@@ -403,6 +554,17 @@ st.markdown("""
     .feature-item p {
         color: var(--neutral-600);
         font-size: 0.95rem;
+    }
+    
+    /* 그래프 스타일 개선 */
+    .js-plotly-plot {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .js-plotly-plot:hover {
+        box-shadow: var(--shadow-md);
     }
     
     /* 반응형 스타일 */
@@ -450,30 +612,67 @@ st.markdown("""
         }
     }
     
-    /* 인사이트 박스 스타일 */
-    .insight-box {
-        background-color: var(--neutral-50);
-        border-left: 4px solid var(--primary-color);
-        padding: 1rem;
-        border-radius: 0.375rem;
-        margin-bottom: 1.25rem;
-        transition: var(--transition-all);
-    }
-    
-    .insight-box:hover {
-        box-shadow: var(--shadow-md);
-        transform: translateX(2px);
-    }
-    
-    /* 그래프 스타일 개선 */
-    .js-plotly-plot {
-        border-radius: 0.5rem;
-        overflow: hidden;
-        transition: var(--transition-all);
-    }
-    
-    .js-plotly-plot:hover {
-        box-shadow: var(--shadow-md);
+    /* 다크 모드 지원 */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --primary-color: var(--primary-400);
+            --primary-light: var(--primary-300);
+            --primary-dark: var(--primary-600);
+        }
+        
+        .stApp {
+            background-color: var(--neutral-900);
+            color: var(--neutral-200);
+        }
+        
+        .dashboard-card,
+        .metric-card,
+        .dataframe th,
+        .empty-state,
+        .footer,
+        [data-testid="stSidebar"] {
+            background-color: var(--neutral-800);
+            border-color: var(--neutral-700);
+        }
+        
+        .sub-title {
+            color: var(--neutral-400);
+        }
+        
+        .metric-title {
+            color: var(--neutral-300);
+        }
+        
+        .metric-desc {
+            color: var(--neutral-400);
+        }
+        
+        .dataframe th {
+            background-color: var(--neutral-800);
+            color: var(--primary-300);
+            border-bottom: 2px solid var(--neutral-700);
+        }
+        
+        .dataframe td {
+            border-bottom: 1px solid var(--neutral-700);
+        }
+        
+        .dataframe tr:hover td {
+            background-color: var(--neutral-800);
+        }
+        
+        .insight-box {
+            background-color: var(--neutral-800);
+        }
+        
+        .feature-item {
+            background-color: var(--neutral-800);
+            border-color: var(--neutral-700);
+        }
+        
+        .feature-item:hover {
+            background-color: var(--neutral-700);
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -482,8 +681,11 @@ def main():
     # 헤더 섹션
     st.markdown("""
     <div class="header-container">
+        <div class="header-icon">
+            <i class="fas fa-chart-line"></i>
+        </div>
         <div class="header-content">
-            <div class="main-title">TalentMetrics <i class="fas fa-chart-line"></i></div>
+            <div class="main-title">TalentMetrics</div>
             <div class="sub-title">채용 데이터를 시각화하고 핵심 인사이트를 발견하세요</div>
         </div>
     </div>
@@ -582,19 +784,19 @@ def main():
             <h2>TalentMetrics에 오신 것을 환영합니다</h2>
             <p>채용 데이터를 업로드하여 인사이트를 발견하세요</p>
             <div class="features">
-                <div class="feature-item">
+                <div class="feature-item staggered-item">
                     <h3><i class="fas fa-chart-bar"></i> 채용 현황 분석</h3>
                     <p>부서별 채용 현황을 한눈에 파악하고 분석하세요</p>
                 </div>
-                <div class="feature-item">
+                <div class="feature-item staggered-item">
                     <h3><i class="fas fa-exchange-alt"></i> 부서별 비교</h3>
                     <p>다양한 지표를 기반으로 부서 간 비교 분석을 수행하세요</p>
                 </div>
-                <div class="feature-item">
+                <div class="feature-item staggered-item">
                     <h3><i class="fas fa-chart-line"></i> 추세 분석</h3>
                     <p>시간에 따른 채용 추세를 파악하고 예측하세요</p>
                 </div>
-                <div class="feature-item">
+                <div class="feature-item staggered-item">
                     <h3><i class="fas fa-search"></i> 고급 인사이트</h3>
                     <p>데이터 기반의 스마트한 채용 의사결정을 내리세요</p>
                 </div>
