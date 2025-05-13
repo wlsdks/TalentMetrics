@@ -25,8 +25,9 @@ def render_sidebar(df=None):
             background-color: #f8fafc;
             border-radius: 0.5rem;
             border: 1px solid #e2e8f0;
-            padding: 1.25rem 1rem 0.5rem;
-            margin: 0.5rem 1rem 0.5rem;
+            padding: 1.25rem 0 0.5rem 0;
+            margin: 0.5rem 0 0.5rem 0;
+            box-sizing: border-box;
         }
         
         .file-upload-header {
@@ -52,7 +53,8 @@ def render_sidebar(df=None):
         
         /* 사이드바에서 파일 업로더의 스타일을 수정 */
         [data-testid="stFileUploader"] {
-            margin: 0 1rem 1rem;
+            margin: 0;
+            width: 100%;
         }
         
         [data-testid="stFileUploader"] > div {
@@ -60,7 +62,7 @@ def render_sidebar(df=None):
         }
         
         [data-testid="stFileUploader"] > div > div {
-            padding: 1.5rem 1rem;
+            padding: 1.5rem 0;
             border: 2px dashed #cbd5e1;
             border-radius: 0.375rem;
             background-color: rgba(241, 245, 249, 0.7);
@@ -84,7 +86,8 @@ def render_sidebar(df=None):
         .button-container {
             display: flex;
             gap: 0.75rem;
-            padding: 0 1rem 1.5rem;
+            padding: 0;
+            width: 100%;
         }
         
         /* 헤더 - 앱 타이틀 제거 */
@@ -96,7 +99,7 @@ def render_sidebar(df=None):
         
         /* 섹션 */
         .new-sidebar-section {
-            padding: 0 1rem;
+            padding: 0;
             margin-bottom: 1.5rem;
         }
         
@@ -167,7 +170,7 @@ def render_sidebar(df=None):
         
         /* 푸터 */
         .new-sidebar-footer {
-            padding: 1rem;
+            padding: 1rem 0;
             font-size: 0.75rem;
             color: #64748b;
             text-align: center;
@@ -212,17 +215,20 @@ def render_sidebar(df=None):
         if df is None:
             # 데이터 입력 섹션을 하나의 박스로 통합
             st.markdown("""
-            <div class="file-upload-container">
-                <div class="file-upload-header">
-                    <i class="fas fa-file-excel"></i>
-                    <span>데이터 입력</span>
-                </div>
-                <div class="file-upload-desc">
-                    분석할 Excel 파일을 업로드하거나 데모 데이터를 사용하세요
+            <div class="sidebar-section-wrapper">
+                <div class="file-upload-container">
+                    <div class="file-upload-header">
+                        <i class="fas fa-file-excel"></i>
+                        <span>데이터 입력</span>
+                    </div>
+                    <div class="file-upload-desc">
+                        분석할 Excel 파일을 업로드하거나 데모 데이터를 사용하세요
+                    </div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
             
+            st.markdown('<div class="sidebar-section-wrapper">', unsafe_allow_html=True)
             uploaded_file = st.file_uploader(
                 "",
                 type=["xlsx", "xls"],
@@ -230,14 +236,9 @@ def render_sidebar(df=None):
                 key="file_uploader",
                 label_visibility="collapsed"
             )
+            st.markdown('</div>', unsafe_allow_html=True)
             
-            config["uploaded_file"] = uploaded_file
-            
-            # 버튼 컨테이너 추가
-            st.markdown("""
-            <div class="button-container">
-            """, unsafe_allow_html=True)
-            
+            st.markdown('<div class="sidebar-section-wrapper"><div class="button-container">', unsafe_allow_html=True)
             col1, col2 = st.columns(2)
             with col1:
                 if st.button(
@@ -257,11 +258,10 @@ def render_sidebar(df=None):
                 ):
                     st.experimental_rerun()
                     
-            st.markdown("""
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown('</div></div>', unsafe_allow_html=True)
         else:
             # 데이터 선택 섹션
+            st.markdown('<div class="sidebar-section-wrapper">', unsafe_allow_html=True)
             st.markdown("""
             <div class="new-sidebar-section">
                 <div class="new-sidebar-section-title">
@@ -315,6 +315,7 @@ def render_sidebar(df=None):
             config["value_col"] = value_col
             
             # 추가 설정 섹션
+            st.markdown('<div class="sidebar-section-wrapper">', unsafe_allow_html=True)
             st.markdown("""
             <div class="new-sidebar-section">
                 <div class="new-sidebar-section-title">
@@ -428,5 +429,6 @@ def render_sidebar(df=None):
                 TalentMetrics v2.0 • {datetime.datetime.now().strftime('%Y-%m-%d')}
             </div>
             """, unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
     
     return config
