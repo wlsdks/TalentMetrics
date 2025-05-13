@@ -40,8 +40,6 @@ def render_sidebar(df=None):
         "dashboard_style": "기본 대시보드"
     }
     with st.sidebar:
-        st.title("TalentMetrics")
-        st.markdown("---")
         if df is None:
             uploaded_file = st.file_uploader(
                 "엑셀 파일 업로드",

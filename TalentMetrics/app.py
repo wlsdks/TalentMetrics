@@ -9,10 +9,10 @@ from utils.ui.sidebar import render_sidebar
 from utils.ui.metrics import render_hr_metrics_dashboard
 from layout.title import render_title
 from layout.footer import render_footer
-from pages.department_analysis import department_analysis_tab
-from pages.detail_analysis import detail_analysis_tab
-from pages.comparison_analysis import comparison_analysis_tab
-from pages.advanced_analysis import advanced_analysis_tab
+from modules.department_analysis import department_analysis_tab
+from modules.detail_analysis import detail_analysis_tab
+from modules.comparison_analysis import comparison_analysis_tab
+from modules.advanced_analysis import advanced_analysis_tab
 from utils.visualization.comparison import create_comparison_chart
 from utils.ui.comparison import render_enhanced_comparison_section
 from utils.visualization.outlier import create_outlier_chart
