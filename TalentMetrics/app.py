@@ -20,10 +20,16 @@ from utils.advanced_charts import (
     create_timeline_chart, create_boxplot, create_sankey_diagram, create_gauge_chart
 )
 from utils.hr_metrics import calculate_hr_metrics
-from utils.ui import (
-    set_page_config, load_css, render_sidebar, render_metrics, 
-    render_hr_metrics_dashboard, render_enhanced_comparison_section, render_empty_state
-)
+from utils.ui.sidebar import set_page_config, load_css, render_sidebar
+from utils.ui.metrics import render_metrics, render_hr_metrics_dashboard
+from utils.ui.comparison import render_comparison_section, render_enhanced_comparison_section
+from utils.ui.empty_state import render_empty_state
+from pages.department_analysis import department_analysis_tab
+from pages.detail_analysis import detail_analysis_tab
+from pages.comparison_analysis import comparison_analysis_tab
+from pages.advanced_analysis import advanced_analysis_tab
+from layout.title import render_title
+from layout.footer import render_footer
 
 # 페이지 설정
 st.set_page_config(
@@ -268,10 +274,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 타이틀
-st.markdown("""
-<div class="main-title">TalentMetrics - HR 채용 대시보드</div>
-<div class="sub-title">채용 데이터를 시각화하고 핵심 인사이트를 발견하세요</div>
-""", unsafe_allow_html=True)
+render_title()
 
 # 메인 앱 로직
 def main():
@@ -452,357 +455,22 @@ def main():
             tab1, tab2, tab3, tab4 = st.tabs(["📈 부서별 분석", "🔍 상세 분석", "🔄 비교 분석", "📊 고급 분석"])
             
             with tab1:
-                st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-                
-                # 상단 요약 통계
-                col1, col2, col3, col4 = st.columns(4)
-                
-                with col1:
-                    st.markdown(f"""
-                    <div class="metric-card">
-                        <div class="metric-value">{summary['total_value']:,.0f}</div>
-                        <div class="metric-label">총 채용 인원</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col2:
-                    st.markdown(f"""
-                    <div class="metric-card">
-                        <div class="metric-value">{summary['avg_value']:,.1f}</div>
-                        <div class="metric-label">평균 채용 인원</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col3:
-                    st.markdown(f"""
-                    <div class="metric-card">
-                        <div class="metric-value">{summary['max_category'].get(value_col, 0):,.0f}</div>
-                        <div class="metric-label">최대 채용 인원</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col4:
-                    st.markdown(f"""
-                    <div class="metric-card">
-                        <div class="metric-value">{summary['min_category'].get(value_col, 0):,.0f}</div>
-                        <div class="metric-label">최소 채용 인원</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                st.markdown('</div>', unsafe_allow_html=True)
-                
-                # 차트 행 1
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-                    st.subheader("부서별 채용 현황")
-                    
-                    # 막대 차트
-                    bar_fig = create_bar_chart(
-                        processed_df, 
-                        category_col, 
-                        value_col, 
-                        color_scheme,
-                        title=f"{category_col}별 {value_col}"
-                    )
-                    
-                    if bar_fig:
-                        st.plotly_chart(bar_fig, use_container_width=True)
-                    
-                    # 데이터가 많을 경우 알림
-                    if len(processed_df) > 15:
-                        st.caption(f"* 모든 {category_col}이 표시되지 않을 수 있습니다.")
-                    
-                    st.markdown('</div>', unsafe_allow_html=True)
-                
-                with col2:
-                    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-                    st.subheader("채용 분포")
-                    
-                    # 파이 차트 생성
-                    pie_df = processed_df.head(10) if len(processed_df) > 10 else processed_df
-                    pie_fig = create_pie_chart(
-                        pie_df,
-                        category_col,
-                        value_col,
-                        color_scheme
-                    )
-                    if pie_fig:
-                        st.plotly_chart(pie_fig, use_container_width=True)
-                    
-                    # 데이터가 많을 경우 알림
-                    if len(processed_df) > 10:
-                        st.caption(f"* 상위 10개 {category_col}만 표시됩니다.")
-                    
-                    st.markdown('</div>', unsafe_allow_html=True)
-                
-                # 차트 행 2
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-                    st.subheader("평균 대비 성과")
-                    
-                    # 불릿 차트
-                    bullet_fig, is_truncated = create_bullet_chart(
-                        processed_df,
-                        category_col,
-                        value_col,
-                        summary["avg_value"],
-                        color_scheme
-                    )
-                    
-                    if bullet_fig:
-                        st.plotly_chart(bullet_fig, use_container_width=True)
-                        
-                        if is_truncated:
-                            st.caption(f"* 상위 15개 {category_col}만 표시됩니다.")
-                    
-                    st.markdown('</div>', unsafe_allow_html=True)
-                
-                with col2:
-                    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-                    st.subheader("히트맵 분석")
-                    
-                    # 히트맵
-                    heatmap_fig = create_heatmap(
-                        processed_df,
-                        category_col,
-                        value_col,
-                        color_scheme
-                    )
-                    
-                    if heatmap_fig:
-                        st.plotly_chart(heatmap_fig, use_container_width=True)
-                    
-                    st.markdown('</div>', unsafe_allow_html=True)
-                
-                # 시계열 데이터가 있으면 추세 차트 추가
-                if date_col and date_col in df.columns:
-                    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-                    st.subheader("채용 추세 분석")
-                    
-                    # 타임라인 차트
-                    timeline_fig = create_timeline_chart(
-                        df,
-                        date_col,
-                        value_col,
-                        category_col=category_col,
-                        color_scheme=color_scheme
-                    )
-                    
-                    if timeline_fig:
-                        st.plotly_chart(timeline_fig, use_container_width=True)
-                    
-                    st.markdown('</div>', unsafe_allow_html=True)
-            
+                department_analysis_tab(processed_df, summary, category_col, value_col, dashboard_style, color_scheme, df, date_col)
             with tab2:
-                st.subheader("상세 데이터 분석")
-                
-                # 다양한 시각화 옵션 선택
-                viz_options = ["트리맵", "레이더 차트", "상자 그림", "버블 차트"]
-                if budget_col:
-                    viz_options.append("효율성 분석")
-                if gender_col:
-                    viz_options.append("성별 분포")
-                if age_col:
-                    viz_options.append("연령대 분포")
-                
-                selected_viz = st.multiselect(
-                    "표시할 시각화 선택", 
-                    viz_options,
-                    default=["트리맵", "레이더 차트"] if len(viz_options) >= 2 else viz_options[:1]
-                )
-                
-                # 선택한 시각화 표시
-                if "트리맵" in selected_viz:
-                    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-                    st.subheader(f"{category_col} 분포 (트리맵)")
-                    
-                    treemap_fig = create_treemap(
-                        processed_df,
-                        category_col,
-                        value_col,
-                        color_scheme
-                    )
-                    
-                    if treemap_fig:
-                        st.plotly_chart(treemap_fig, use_container_width=True)
-                    
-                    st.markdown('</div>', unsafe_allow_html=True)
-                
-                if "레이더 차트" in selected_viz:
-                    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-                    st.subheader("부서별 다차원 비교 (레이더 차트)")
-                    
-                    # 레이더 차트용 지표 선택
-                    metrics_cols = []
-                    if value_col:
-                        metrics_cols.append(value_col)
-                    if budget_col:
-                        metrics_cols.append(budget_col)
-                    
-                    # 추가 숫자형 열 찾기
-                    extra_metrics = [col for col in df.select_dtypes(include=['number']).columns 
-                                    if col not in [value_col, budget_col] and col in df.columns]
-                    metrics_cols.extend(extra_metrics[:3])  # 최대 3개 추가
-                    
-                    radar_fig = create_radar_chart(
-                        processed_df,
-                        category_col,
-                        metrics_cols,
-                        color_scheme
-                    )
-                    
-                    if radar_fig:
-                        st.plotly_chart(radar_fig, use_container_width=True)
-                    else:
-                        st.info("레이더 차트를 생성하려면 3개 이상의 숫자형 열이 필요합니다.")
-                    
-                    st.markdown('</div>', unsafe_allow_html=True)
-                
-                # 상세 데이터 테이블
-                st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-                st.subheader("상세 데이터")
-                
-                # 검색 기능 추가
-                search_term = st.text_input("부서 검색", placeholder="검색어 입력...")
-                
-                # 검색어에 따라 필터링
-                filtered_df = processed_df
-                if search_term:
-                    filtered_df = processed_df[processed_df[category_col].str.contains(search_term, case=False, na=False)]
-                
-                # 정렬 기능
-                sort_col = st.radio("정렬 기준", [category_col, value_col], horizontal=True)
-                sort_order = st.radio("정렬 순서", ["오름차순", "내림차순"], horizontal=True)
-                
-                # 정렬 적용
-                if sort_order == "오름차순":
-                    filtered_df = filtered_df.sort_values(by=sort_col)
-                else:
-                    filtered_df = filtered_df.sort_values(by=sort_col, ascending=False)
-                
-                # 데이터 테이블에 스타일링 적용
-                st.dataframe(
-                    filtered_df.style.background_gradient(cmap='Blues', subset=[value_col]),
-                    use_container_width=True,
-                    height=400
-                )
-                
-                # 다운로드 버튼
-                csv = filtered_df.to_csv(index=False).encode('utf-8')
-                st.download_button(
-                    label="CSV로 다운로드",
-                    data=csv,
-                    file_name=f"{category_col}_{value_col}_분석.csv",
-                    mime="text/csv",
-                )
-                
-                st.markdown('</div>', unsafe_allow_html=True)
-            
+                detail_analysis_tab(processed_df, category_col, value_col, df, budget_col, gender_col, age_col, color_scheme)
             with tab3:
-                st.subheader("비교 분석")
-                
-                # 부서 비교 기능
-                st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-                st.subheader("부서 비교 분석")
-                
-                # 부서 비교 설명
-                st.markdown("""
-                <div style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-                    <p style="margin: 0; font-size: 0.9rem;">두 개의 부서를 선택하여 채용 현황을 비교해보세요. 
-                    인원수, 효율성, 성장률 등 다양한 지표를 기반으로 비교 분석 결과를 확인할 수 있습니다.</p>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # 비교할 부서 선택
-                categories = processed_df[category_col].unique().tolist()
-                
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    cat1 = st.selectbox("첫 번째 부서", categories, index=0)
-                
-                with col2:
-                    remaining_cats = [c for c in categories if c != cat1]
-                    cat2_index = 0 if remaining_cats else 0
-                    cat2 = st.selectbox(
-                        "두 번째 부서", 
-                        remaining_cats,
-                        index=cat2_index
-                    )
-                
-                # 비교 데이터 생성
-                comparison_data = generate_comparison_data(
-                    processed_df, 
-                    category_col, 
-                    value_col, 
-                    cat1, 
-                    cat2
+                comparison_analysis_tab(
+                    processed_df, category_col, value_col, color_scheme,
+                    generate_comparison_data, create_comparison_chart, render_enhanced_comparison_section, hr_metrics
                 )
-                
-                # 비교 차트 생성
-                comparison_chart = create_comparison_chart(
-                    comparison_data,
-                    category_col,
-                    value_col,
-                    color_scheme
+            with tab4:
+                advanced_analysis_tab(
+                    processed_df, value_col, date_col,
+                    create_outlier_chart, detect_outliers, create_distribution_chart, create_correlation_heatmap, calculate_trends, create_trend_chart
                 )
-                
-                # 개선된 비교 섹션 렌더링
-                if comparison_chart:
-                    render_enhanced_comparison_section(
-                        processed_df,
-                        category_col,
-                        value_col,
-                        comparison_data,
-                        comparison_chart,
-                        hr_metrics
-                    )
-                
-                st.markdown('</div>', unsafe_allow_html=True)
-            
-            with tab4:    
-                col1, col2 = st.columns(2)
-                
-                # 이상치 분석 (좌측)
-                with col1:
-                    st.write("### 이상치 분석")
-                    outliers = detect_outliers(processed_df, value_col)
-                    if not outliers.empty:
-                        st.plotly_chart(create_outlier_chart(processed_df, value_col, outliers), use_container_width=True)
-                        st.write(f"발견된 이상치 수: {len(outliers)}")
-                    else:
-                        st.info("이상치가 발견되지 않았습니다.")
-                        st.plotly_chart(create_outlier_chart(processed_df, value_col, outliers), use_container_width=True)
-                
-                # 분포 분석 (우측)
-                with col2:
-                    st.write("### 분포 분석")
-                    st.plotly_chart(create_distribution_chart(processed_df, value_col), use_container_width=True)
-                
-                # 상관관계 분석
-                if len(processed_df.select_dtypes(include=['number']).columns) > 1:
-                    st.write("### 상관관계 분석")
-                    numeric_cols = processed_df.select_dtypes(include=['number']).columns.tolist()
-                    st.plotly_chart(create_correlation_heatmap(processed_df, numeric_cols))
-                
-                # 추세 분석
-                if date_col:
-                    st.write("### 추세 분석")
-                    trends = calculate_trends(processed_df, date_col, value_col)
-                    if trends:
-                        st.plotly_chart(create_trend_chart(trends))
             
             # 푸터
-            st.markdown("""
-            <div class="footer">
-                <p>© 2025 TalentMetrics - HR 채용 대시보드 v2.0</p>
-                <p style="font-size: 0.8rem; color: #9ca3af;">데이터 기반의 스마트한 채용 의사결정을 위한 솔루션</p>
-            </div>
-            """, unsafe_allow_html=True)
+            render_footer()
             
         else:
             st.error("선택한 열에서 데이터를 처리하는 데 문제가 발생했습니다. 다른 열을 선택해 보세요.")
