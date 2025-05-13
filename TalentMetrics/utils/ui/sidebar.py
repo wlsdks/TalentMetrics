@@ -226,24 +226,19 @@ def render_sidebar(df=None):
     """, unsafe_allow_html=True)
     
     with st.sidebar:
-        # 데이터 섹션으로 바로 시작 (헤더 제거)
         if df is None:
-            # 데이터 입력 섹션을 하나의 박스로 통합
             st.markdown("""
-            <div class="sidebar-section-wrapper">
-                <div class="file-upload-container">
-                    <div class="file-upload-header">
-                        <i class="fas fa-file-excel"></i>
-                        <span>데이터 입력</span>
-                    </div>
-                    <div class="file-upload-desc">
-                        분석할 Excel 파일을 업로드하거나 데모 데이터를 사용하세요
-                    </div>
+            <div class="file-upload-container">
+                <div class="file-upload-header">
+                    <i class="fas fa-file-excel"></i>
+                    <span>데이터 입력</span>
+                </div>
+                <div class="file-upload-desc">
+                    분석할 Excel 파일을 업로드하거나 데모 데이터를 사용하세요
                 </div>
             </div>
             """, unsafe_allow_html=True)
-            
-            st.markdown('<div class="sidebar-section-wrapper">', unsafe_allow_html=True)
+
             uploaded_file = st.file_uploader(
                 "",
                 type=["xlsx", "xls"],
@@ -251,14 +246,16 @@ def render_sidebar(df=None):
                 key="file_uploader",
                 label_visibility="collapsed"
             )
-            st.markdown('</div>', unsafe_allow_html=True)
-            
-            st.markdown('<div class="sidebar-section-wrapper"><div class="button-container">', unsafe_allow_html=True)
+            config["uploaded_file"] = uploaded_file
+
+            st.markdown("""
+            <div class="button-container">
+            """, unsafe_allow_html=True)
             col1, col2 = st.columns(2)
             with col1:
                 if st.button(
-                    "데모 데이터", 
-                    help="샘플 데이터로 시작하기", 
+                    "데모 데이터",
+                    help="샘플 데이터로 시작하기",
                     key="demo_btn",
                     use_container_width=True
                 ):
@@ -266,17 +263,16 @@ def render_sidebar(df=None):
                     return config
             with col2:
                 if st.button(
-                    "초기화", 
-                    help="설정 초기화", 
+                    "초기화",
+                    help="설정 초기화",
                     key="reset_btn",
                     use_container_width=True
                 ):
                     st.experimental_rerun()
-                    
-            st.markdown('</div></div>', unsafe_allow_html=True)
+            st.markdown("""
+            </div>
+            """, unsafe_allow_html=True)
         else:
-            # 데이터 선택 섹션
-            st.markdown('<div class="sidebar-section-wrapper">', unsafe_allow_html=True)
             st.markdown("""
             <div class="new-sidebar-section">
                 <div class="new-sidebar-section-title">
@@ -284,19 +280,18 @@ def render_sidebar(df=None):
                 </div>
             </div>
             """, unsafe_allow_html=True)
-            
+
             st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
             st.markdown('<div class="new-form-label">분석할 데이터 미리보기</div>', unsafe_allow_html=True)
             st.dataframe(df.head(3), use_container_width=True, height=120)
-            
-            # 열 선택
+            st.markdown('</div>', unsafe_allow_html=True)
+
             suggested_cat_cols, suggested_val_cols = suggest_columns(df)
             all_columns = df.columns.tolist()
-            
+
             cat_index = 0
             if suggested_cat_cols and suggested_cat_cols[0] in all_columns:
                 cat_index = all_columns.index(suggested_cat_cols[0])
-            
             st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
             st.markdown('<div class="new-form-label">분류 기준 열</div>', unsafe_allow_html=True)
             category_col = st.selectbox(
@@ -308,13 +303,11 @@ def render_sidebar(df=None):
                 label_visibility="collapsed"
             )
             st.markdown('</div>', unsafe_allow_html=True)
-            
             config["category_col"] = category_col
-            
+
             val_index = 0
             if suggested_val_cols and suggested_val_cols[0] in all_columns:
                 val_index = all_columns.index(suggested_val_cols[0])
-            
             st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
             st.markdown('<div class="new-form-label">수치 데이터 열</div>', unsafe_allow_html=True)
             value_col = st.selectbox(
@@ -326,11 +319,8 @@ def render_sidebar(df=None):
                 label_visibility="collapsed"
             )
             st.markdown('</div>', unsafe_allow_html=True)
-            
             config["value_col"] = value_col
-            
-            # 추가 설정 섹션
-            st.markdown('<div class="sidebar-section-wrapper">', unsafe_allow_html=True)
+
             st.markdown("""
             <div class="new-sidebar-section">
                 <div class="new-sidebar-section-title">
@@ -338,7 +328,6 @@ def render_sidebar(df=None):
                 </div>
             </div>
             """, unsafe_allow_html=True)
-            
             with st.expander("고급 설정", expanded=False):
                 st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
                 st.markdown('<div class="new-form-label">날짜 열 (선택사항)</div>', unsafe_allow_html=True)
@@ -351,7 +340,6 @@ def render_sidebar(df=None):
                 )
                 config["date_col"] = date_col if date_col != "없음" else None
                 st.markdown('</div>', unsafe_allow_html=True)
-                
                 st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
                 st.markdown('<div class="new-form-label">예산 열 (선택사항)</div>', unsafe_allow_html=True)
                 budget_col = st.selectbox(
@@ -363,7 +351,6 @@ def render_sidebar(df=None):
                 )
                 config["budget_col"] = budget_col if budget_col != "없음" else None
                 st.markdown('</div>', unsafe_allow_html=True)
-                
                 st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
                 st.markdown('<div class="new-form-label">성별 열 (선택사항)</div>', unsafe_allow_html=True)
                 gender_col = st.selectbox(
@@ -375,7 +362,6 @@ def render_sidebar(df=None):
                 )
                 config["gender_col"] = gender_col if gender_col != "없음" else None
                 st.markdown('</div>', unsafe_allow_html=True)
-                
                 st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
                 st.markdown('<div class="new-form-label">연령 열 (선택사항)</div>', unsafe_allow_html=True)
                 age_col = st.selectbox(
@@ -387,8 +373,7 @@ def render_sidebar(df=None):
                 )
                 config["age_col"] = age_col if age_col != "없음" else None
                 st.markdown('</div>', unsafe_allow_html=True)
-            
-            # 테마 선택
+
             st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
             st.markdown('<div class="new-form-label">시각화 테마</div>', unsafe_allow_html=True)
             dashboard_style = st.selectbox(
@@ -400,10 +385,8 @@ def render_sidebar(df=None):
                 label_visibility="collapsed"
             )
             st.markdown('</div>', unsafe_allow_html=True)
-            
             config["dashboard_style"] = dashboard_style
-            
-            # 테마 프리뷰
+
             if dashboard_style == "모던 블루":
                 colors = ["#eef2ff", "#c7d2fe", "#818cf8", "#4f46e5", "#3730a3"]
                 theme_desc = "깔끔한 블루 기반의 전문적인 테마"
@@ -416,7 +399,6 @@ def render_sidebar(df=None):
             elif dashboard_style == "HR 특화":
                 colors = ["#ecfdf5", "#a7f3d0", "#6ee7b7", "#10b981", "#065f46"]
                 theme_desc = "HR에 어울리는 그린 계열 테마"
-            
             st.markdown(f"""
             <div class="new-theme-preview">
                 <div class="new-theme-color" style="background-color: {colors[0]};"></div>
@@ -427,8 +409,7 @@ def render_sidebar(df=None):
             </div>
             <div class="new-theme-caption">{theme_desc}</div>
             """, unsafe_allow_html=True)
-            
-            # 설정 내보내기
+
             st.download_button(
                 label="설정 내보내기",
                 data=str(config),
@@ -437,13 +418,9 @@ def render_sidebar(df=None):
                 help="현재 대시보드 설정을 파일로 저장합니다",
                 use_container_width=True
             )
-            
-            # 푸터
             st.markdown(f"""
             <div class="new-sidebar-footer">
                 TalentMetrics v2.0 • {datetime.datetime.now().strftime('%Y-%m-%d')}
             </div>
             """, unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-    
     return config
