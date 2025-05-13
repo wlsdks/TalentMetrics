@@ -1,4 +1,6 @@
 import streamlit as st
+from utils.visualization import create_treemap
+from utils.visualization.advanced_charts import create_radar_chart
 
 def detail_analysis_tab(processed_df, category_col, value_col, df, budget_col, gender_col, age_col, color_scheme):
     viz_options = ["트리맵", "레이더 차트", "상자 그림", "버블 차트"]
@@ -13,7 +15,6 @@ def detail_analysis_tab(processed_df, category_col, value_col, df, budget_col, g
         viz_options,
         default=["트리맵", "레이더 차트"] if len(viz_options) >= 2 else viz_options[:1]
     )
-    from utils.visualization import create_treemap, create_radar_chart
     # 트리맵
     if "트리맵" in selected_viz:
         st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)

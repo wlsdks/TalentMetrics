@@ -275,7 +275,7 @@ def preprocess_data(df):
         return None
     
     # 결측치 처리
-    df = df.fillna(method='ffill').fillna(method='bfill')
+    df = df.ffill().bfill()
     
     # 중복 제거
     df = df.drop_duplicates()
