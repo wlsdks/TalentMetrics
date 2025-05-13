@@ -68,8 +68,6 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
     time.sleep(0.5)
     message_placeholder.empty()
     
-    st.markdown('<div class="dashboard-card" style="padding: 20px;">', unsafe_allow_html=True)
-    
     # 헤더 섹션
     st.markdown("""
     <div class="metric-section-header">
@@ -81,7 +79,6 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
             <p>현재 인력 현황과 중요 지표를 한눈에 파악하세요</p>
         </div>
     </div>
-    
     <style>
         .metric-section-header {
             display: flex;
@@ -91,7 +88,6 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--neutral-200);
         }
-        
         .metric-section-icon {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
@@ -104,7 +100,6 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
             font-size: 1.5rem;
             box-shadow: var(--shadow-md);
         }
-        
         .metric-section-title h2 {
             margin: 0;
             padding: 0;
@@ -112,26 +107,22 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
             color: var(--neutral-800);
             font-weight: 600;
         }
-        
         .metric-section-title p {
             margin: 0;
             padding: 0;
             font-size: 0.9rem;
             color: var(--neutral-500);
         }
-        
         .metric-icon {
             font-size: 1.5rem;
             color: var(--primary-color);
             margin-bottom: 0.75rem;
         }
-        
         .metric-label {
             font-size: 0.85rem;
             color: var(--neutral-500);
             margin-top: 0.25rem;
         }
-        
         /* 반응형 */
         @media screen and (max-width: 768px) {
             .metric-section-header {
@@ -145,7 +136,6 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
     
     # 주요 메트릭 카드
     col1, col2, col3, col4 = st.columns(4, gap="large")
-    
     with col1:
         st.markdown(f"""
         <div class="metric-card">
@@ -156,7 +146,6 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
             <div class="metric-value animated-number">{hr_metrics.get('total_headcount', 0):,}명</div>
         </div>
         """, unsafe_allow_html=True)
-    
     with col2:
         st.markdown(f"""
         <div class="metric-card">
@@ -167,7 +156,6 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
             <div class="metric-value animated-number">{hr_metrics.get('avg_headcount', 0):.1f}명</div>
         </div>
         """, unsafe_allow_html=True)
-    
     with col3:
         if 'total_budget' in hr_metrics:
             st.markdown(f"""
@@ -190,13 +178,11 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
                 <div class="metric-label">데이터 없음</div>
             </div>
             """, unsafe_allow_html=True)
-    
     with col4:
         if 'yearly_growth_rates' in hr_metrics:
             latest_growth = list(hr_metrics['yearly_growth_rates'].values())[-1]
             growth_icon = "fa-arrow-up" if latest_growth > 0 else "fa-arrow-down"
             growth_color = "var(--success-color)" if latest_growth > 0 else "var(--danger-color)"
-            
             st.markdown(f"""
             <div class="metric-card">
                 <div class="metric-icon">
@@ -219,7 +205,7 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
                 <div class="metric-label">데이터 없음</div>
             </div>
             """, unsafe_allow_html=True)
-    
+
     # 차트 섹션
     st.markdown("<div style='margin-top: 2rem;'></div>", unsafe_allow_html=True)
     
@@ -368,5 +354,3 @@ def render_hr_metrics_dashboard(summary, hr_metrics):
         )
         
         st.plotly_chart(fig, use_container_width=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)

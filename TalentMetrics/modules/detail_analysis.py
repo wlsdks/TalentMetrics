@@ -17,8 +17,6 @@ def detail_analysis_tab(processed_df, category_col, value_col, df, budget_col, g
     )
     # 트리맵
     if "트리맵" in selected_viz:
-        st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-        st.subheader(f"{category_col} 분포 (트리맵)")
         treemap_fig = create_treemap(
             processed_df,
             category_col,
@@ -26,12 +24,12 @@ def detail_analysis_tab(processed_df, category_col, value_col, df, budget_col, g
             color_scheme
         )
         if treemap_fig:
+            st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+            st.subheader(f"{category_col} 분포 (트리맵)")
             st.plotly_chart(treemap_fig, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
     # 레이더 차트
     if "레이더 차트" in selected_viz:
-        st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-        st.subheader("부서별 다차원 비교 (레이더 차트)")
         metrics_cols = []
         if value_col:
             metrics_cols.append(value_col)
@@ -47,15 +45,15 @@ def detail_analysis_tab(processed_df, category_col, value_col, df, budget_col, g
             color_scheme
         )
         if radar_fig:
+            st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+            st.subheader("부서별 다차원 비교 (레이더 차트)")
             st.plotly_chart(radar_fig, use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.info("레이더 차트를 생성하려면 3개 이상의 숫자형 열이 필요합니다.")
-        st.markdown('</div>', unsafe_allow_html=True)
     # 상세 데이터 테이블
-    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
-    st.subheader("상세 데이터")
-    search_term = st.text_input("부서 검색", placeholder="검색어 입력...")
     filtered_df = processed_df
+    search_term = st.text_input("부서 검색", placeholder="검색어 입력...")
     if search_term:
         filtered_df = processed_df[processed_df[category_col].str.contains(search_term, case=False, na=False)]
     sort_col = st.radio("정렬 기준", [category_col, value_col], horizontal=True)
@@ -64,16 +62,19 @@ def detail_analysis_tab(processed_df, category_col, value_col, df, budget_col, g
         filtered_df = filtered_df.sort_values(by=sort_col)
     else:
         filtered_df = filtered_df.sort_values(by=sort_col, ascending=False)
-    st.dataframe(
-        filtered_df.style.background_gradient(cmap='Blues', subset=[value_col]),
-        use_container_width=True,
-        height=400
-    )
-    csv = filtered_df.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        label="CSV로 다운로드",
-        data=csv,
-        file_name=f"{category_col}_{value_col}_분석.csv",
-        mime="text/csv",
-    )
-    st.markdown('</div>', unsafe_allow_html=True) 
+    if not filtered_df.empty:
+        st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+        st.subheader("상세 데이터")
+        st.dataframe(
+            filtered_df.style.background_gradient(cmap='Blues', subset=[value_col]),
+            use_container_width=True,
+            height=400
+        )
+        csv = filtered_df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="CSV로 다운로드",
+            data=csv,
+            file_name=f"{category_col}_{value_col}_분석.csv",
+            mime="text/csv",
+        )
+        st.markdown('</div>', unsafe_allow_html=True) 

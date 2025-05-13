@@ -2,7 +2,6 @@ import streamlit as st
 
 def comparison_analysis_tab(processed_df, category_col, value_col, color_scheme, generate_comparison_data, create_comparison_chart, render_enhanced_comparison_section, hr_metrics):
     st.subheader("비교 분석")
-    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
     st.subheader("부서 비교 분석")
     st.markdown("""
     <div style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
@@ -36,6 +35,7 @@ def comparison_analysis_tab(processed_df, category_col, value_col, color_scheme,
         color_scheme
     )
     if comparison_chart:
+        st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
         render_enhanced_comparison_section(
             processed_df,
             category_col,
@@ -44,4 +44,4 @@ def comparison_analysis_tab(processed_df, category_col, value_col, color_scheme,
             comparison_chart,
             hr_metrics
         )
-    st.markdown('</div>', unsafe_allow_html=True) 
+        st.markdown('</div>', unsafe_allow_html=True) 
