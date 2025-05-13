@@ -21,11 +21,17 @@ def render_sidebar(df=None):
         }
         
         /* 파일 업로드 컨테이너 통합 스타일 */
+        .sidebar-section-wrapper {
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         .file-upload-container {
             background-color: #f8fafc;
             border-radius: 0.5rem;
-            border: 1px solid #e2e8f0;
-            padding: 1.25rem 0 0.5rem 0;
+            border: 1.5px solid #cbd5e1;
+            box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+            padding: 1.25rem 1.25rem 0.5rem 1.25rem;
             margin: 0.5rem 0 0.5rem 0;
             box-sizing: border-box;
         }
@@ -37,6 +43,7 @@ def render_sidebar(df=None):
             font-weight: 600;
             color: #334155;
             margin-bottom: 0.75rem;
+            padding: 0;
         }
         
         .file-upload-header i {
@@ -49,6 +56,7 @@ def render_sidebar(df=None):
             color: #64748b;
             margin-bottom: 0.75rem;
             line-height: 1.4;
+            padding: 0;
         }
         
         /* 사이드바에서 파일 업로더의 스타일을 수정 */
@@ -58,14 +66,17 @@ def render_sidebar(df=None):
         }
         
         [data-testid="stFileUploader"] > div {
-            padding: 0;
+            padding: 0 1rem;
         }
         
         [data-testid="stFileUploader"] > div > div {
             padding: 1.5rem 0;
-            border: 2px dashed #cbd5e1;
+            border-width: 2px !important;
+            border-style: solid !important;
+            border-color: #64748b !important;
             border-radius: 0.375rem;
             background-color: rgba(241, 245, 249, 0.7);
+            box-shadow: 0 0 0 2px #64748b33;
             transition: all 0.3s ease;
             margin-top: 0;
         }
@@ -108,10 +119,12 @@ def render_sidebar(df=None):
             font-weight: 600;
             color: #334155;
             margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
+            padding: 0.5rem 1.25rem 0.5rem 1.25rem;
             border-bottom: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
+            background: #f4f6fa;
+            border-radius: 0.375rem 0.375rem 0 0;
         }
         
         .new-sidebar-section-title i {
@@ -124,7 +137,7 @@ def render_sidebar(df=None):
         .new-sidebar-info {
             background-color: #f1f5f9;
             border-radius: 0.375rem;
-            padding: 0.75rem;
+            padding: 0.75rem 1.25rem;
             margin-bottom: 1rem;
             font-size: 0.8rem;
             color: #334155;
@@ -139,6 +152,7 @@ def render_sidebar(df=None):
         /* 폼 스타일 */
         .new-form-field {
             margin-bottom: 1rem;
+            padding: 0 1.25rem;
         }
         
         .new-form-label {
@@ -155,7 +169,7 @@ def render_sidebar(df=None):
             height: 0.375rem;
             border-radius: 0.375rem;
             overflow: hidden;
-            margin: 0.75rem 0;
+            margin: 0.75rem 0 0.75rem 1.25rem;
         }
         
         .new-theme-color {
@@ -166,6 +180,7 @@ def render_sidebar(df=None):
             font-size: 0.75rem;
             color: #64748b;
             margin-bottom: 1.25rem;
+            padding-left: 1.25rem;
         }
         
         /* 푸터 */
