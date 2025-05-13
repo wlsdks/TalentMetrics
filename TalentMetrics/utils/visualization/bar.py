@@ -37,7 +37,7 @@ def create_bar_chart(df, category_col, value_col, color_scheme, title=""):
             showgrid=False,
             zeroline=False,
             tickfont=dict(size=12, color='#6b7280'),
-            tickangle=-45
+            tickangle=-30
         ),
         yaxis=dict(
             showgrid=True,
@@ -56,12 +56,15 @@ def create_bar_chart(df, category_col, value_col, color_scheme, title=""):
     fig.update_traces(
         selector=dict(type='bar'),
         texttemplate='%{y:,.0f}',
-        textposition='outside',
+        textposition='auto',
         textfont=dict(
-            size=12,
+            size=10,
             family="Noto Sans KR, sans-serif",
             color="#4b5563"
         ),
+        insidetextanchor='middle',
+        cliponaxis=True,
+        constraintext='both',
         hovertemplate='<b>%{x}</b><br><span style="color:#2563eb;font-weight:bold;">%{y:,.0f}</span><extra></extra>',
         marker=dict(
             line=dict(width=1, color='rgba(255, 255, 255, 0.8)'),
@@ -70,17 +73,7 @@ def create_bar_chart(df, category_col, value_col, color_scheme, title=""):
     )
     
     # 데이터가 많은 경우 안내 메시지
-    if len(df) > 15:
-        fig.add_annotation(
-            x=0.5,
-            y=-0.2,
-            xref="paper",
-            yref="paper",
-            text=f"* 상위 15개 {category_col}만 표시됩니다 (전체 {len(df)}개 중).",
-            showarrow=False,
-            font=dict(size=12, color="#6b7280"),
-            align="center"
-        )
+    annotation_msg = None
     
     # 그라데이션 효과를 위한 설정
     if is_gradient:
@@ -93,5 +86,9 @@ def create_bar_chart(df, category_col, value_col, color_scheme, title=""):
             marker_color=normalized_values,
             marker_colorscale=color_scheme
         )
+    
+    # Streamlit에서 안내 메시지 출력
+    if annotation_msg:
+        st.caption(annotation_msg)
     
     return fig

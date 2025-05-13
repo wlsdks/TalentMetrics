@@ -51,21 +51,21 @@ def department_analysis_tab(processed_df, summary, category_col, value_col, dash
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("부서별 채용 현황")
-            st.plotly_chart(bar_fig, use_container_width=True)
             if len(processed_df) > 15:
-                st.caption(f"* 모든 {category_col}이 표시되지 않을 수 있습니다.")
+                st.caption(f"* 상위 15개 {category_col}만 표시됩니다 (전체 {len(processed_df)}개 중).")
+            st.plotly_chart(bar_fig, use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
         with col2:
             st.subheader("채용 분포")
-            st.plotly_chart(pie_fig, use_container_width=True)
             if len(processed_df) > 10:
                 st.caption(f"* 상위 10개 {category_col}만 표시됩니다.")
+            st.plotly_chart(pie_fig, use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
     elif bar_fig:
         st.subheader("부서별 채용 현황")
         st.plotly_chart(bar_fig, use_container_width=True)
         if len(processed_df) > 15:
-            st.caption(f"* 모든 {category_col}이 표시되지 않을 수 있습니다.")
+            st.caption(f"* 상위 15개 {category_col}만 표시됩니다 (전체 {len(processed_df)}개 중).")
         st.markdown('</div>', unsafe_allow_html=True)
     elif pie_fig:
         st.subheader("채용 분포")
