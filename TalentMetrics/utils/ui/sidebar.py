@@ -11,208 +11,238 @@ def render_sidebar(df=None):
         "dashboard_style": "모던 블루"
     }
     
-    # 사이드바 스타일 적용
+    # 완전히 새로운, 간결한 사이드바 스타일
     st.markdown("""
     <style>
+        /* 사이드바 기본 스타일 */
         [data-testid="stSidebar"] {
-            background-color: white;
-            border-right: 1px solid var(--neutral-200, #e5e5e5);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            background-color: #f8fafc;
+            border-right: 1px solid #e2e8f0;
         }
         
-        .sidebar-header {
-            padding: 1.5rem 1rem;
-            border-bottom: 1px solid var(--neutral-200, #e5e5e5);
-            margin-bottom: 1.5rem;
-            background: linear-gradient(to right, var(--primary-50, #eef2ff), white);
+        /* 파일 업로드 컨테이너 통합 스타일 */
+        .file-upload-container {
+            background-color: #f8fafc;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            padding: 1.25rem 1rem 0.5rem;
+            margin: 0.5rem 1rem 0.5rem;
         }
         
-        .sidebar-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--primary-700, #4338ca);
-            margin-bottom: 0.5rem;
+        .file-upload-header {
             display: flex;
             align-items: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.75rem;
         }
         
-        .sidebar-title i {
+        .file-upload-header i {
             margin-right: 0.5rem;
-            font-size: 1.1em;
+            color: #4f46e5;
         }
         
-        .sidebar-subtitle {
-            font-size: 0.9rem;
-            color: var(--neutral-600, #525252);
+        .file-upload-desc {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 0.75rem;
             line-height: 1.4;
         }
         
-        .sidebar-section {
-            border-top: 1px solid var(--neutral-200, #e5e5e5);
-            padding-top: 1.5rem;
-            margin-top: 1.5rem;
-            position: relative;
+        /* 사이드바에서 파일 업로더의 스타일을 수정 */
+        [data-testid="stFileUploader"] {
+            margin: 0 1rem 1rem;
         }
         
-        .section-title {
-            font-size: 1rem;
+        [data-testid="stFileUploader"] > div {
+            padding: 0;
+        }
+        
+        [data-testid="stFileUploader"] > div > div {
+            padding: 1.5rem 1rem;
+            border: 2px dashed #cbd5e1;
+            border-radius: 0.375rem;
+            background-color: rgba(241, 245, 249, 0.7);
+            transition: all 0.3s ease;
+            margin-top: 0;
+        }
+        
+        [data-testid="stFileUploader"] > div > div:hover {
+            border-color: #818cf8;
+            background-color: rgba(239, 246, 255, 0.7);
+            transform: translateY(-2px);
+        }
+        
+        [data-testid="stFileUploader"] p {
+            margin-bottom: 0;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        
+        /* 버튼 컨테이너 스타일 */
+        .button-container {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0 1rem 1.5rem;
+        }
+        
+        /* 헤더 - 앱 타이틀 제거 */
+        .new-sidebar-header {
+            padding: 1.75rem 1rem 1.25rem;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* 섹션 */
+        .new-sidebar-section {
+            padding: 0 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .new-sidebar-section-title {
+            font-size: 0.9rem;
             font-weight: 600;
-            color: var(--neutral-700, #404040);
+            color: #334155;
             margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
         }
         
-        .section-title i {
+        .new-sidebar-section-title i {
+            color: #4f46e5;
             margin-right: 0.5rem;
-            color: var(--primary-500, #6366f1);
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(to right, var(--primary-200, #c7d2fe), transparent);
-        }
-        
-        /* 파일 업로더 스타일 */
-        [data-testid="stFileUploader"] {
-            margin-bottom: 1.5rem;
-        }
-        
-        [data-testid="stFileUploader"] > div > div {
-            padding: 1.5rem;
-            border: 2px dashed var(--neutral-300, #d4d4d4);
-            border-radius: 0.5rem;
-            background-color: var(--neutral-50, #fafafa);
-            transition: all 0.3s ease;
-        }
-        
-        [data-testid="stFileUploader"] > div > div:hover {
-            border-color: var(--primary-400, #818cf8);
-            background-color: var(--primary-50, #eef2ff);
-        }
-        
-        /* 버튼 그룹 스타일 */
-        .button-group {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        /* 데이터 미리보기 스타일 */
-        .data-preview {
-            padding: 0.75rem;
-            border-radius: 0.375rem;
-            background-color: var(--neutral-50, #fafafa);
-            border: 1px solid var(--neutral-200, #e5e5e5);
-            font-size: 0.85rem;
-            max-height: 15rem;
-            overflow-y: auto;
-        }
-        
-        /* 선택기 래퍼 스타일 */
-        .selector-wrapper {
-            background-color: var(--neutral-50, #fafafa);
-            border-radius: 0.375rem;
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--neutral-200, #e5e5e5);
-        }
-        
-        .selector-wrapper label {
-            font-weight: 500;
-            color: var(--neutral-700, #404040);
-            margin-bottom: 0.25rem;
-            display: block;
             font-size: 0.9rem;
         }
         
-        /* 색상 미리보기 스타일 */
-        .color-preview {
-            display: flex;
-            gap: 0.25rem;
-            margin-top: 0.75rem;
-        }
-        
-        .color-swatch {
-            height: 1.5rem;
-            flex-grow: 1;
-            border-radius: 0.25rem;
-            transition: all 0.3s ease;
-        }
-        
-        .color-swatch:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* 팁 스타일 */
-        .sidebar-tip {
-            background-color: var(--primary-50, #eef2ff);
-            border-left: 3px solid var(--primary-400, #818cf8);
+        /* 정보 메시지 */
+        .new-sidebar-info {
+            background-color: #f1f5f9;
+            border-radius: 0.375rem;
             padding: 0.75rem;
-            border-radius: 0.25rem;
-            font-size: 0.85rem;
-            margin: 1rem 0;
-            color: var(--neutral-700, #404040);
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            color: #334155;
+            border: 1px solid #e2e8f0;
         }
         
-        .sidebar-tip i {
-            color: var(--primary-500, #6366f1);
+        .new-sidebar-info i {
+            color: #4f46e5;
             margin-right: 0.375rem;
         }
         
-        /* 푸터 스타일 */
-        .sidebar-footer {
+        /* 폼 스타일 */
+        .new-form-field {
+            margin-bottom: 1rem;
+        }
+        
+        .new-form-label {
             font-size: 0.8rem;
-            color: var(--neutral-500, #737373);
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 0.375rem;
+            display: block;
+        }
+        
+        /* 테마 프리뷰 */
+        .new-theme-preview {
+            display: flex;
+            height: 0.375rem;
+            border-radius: 0.375rem;
+            overflow: hidden;
+            margin: 0.75rem 0;
+        }
+        
+        .new-theme-color {
+            flex: 1;
+        }
+        
+        .new-theme-caption {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-bottom: 1.25rem;
+        }
+        
+        /* 푸터 */
+        .new-sidebar-footer {
+            padding: 1rem;
+            font-size: 0.75rem;
+            color: #64748b;
             text-align: center;
+            border-top: 1px solid #e2e8f0;
             margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--neutral-200, #e5e5e5);
+        }
+        
+        /* 버튼 스타일 재정의 */
+        div.stButton > button {
+            width: 100%;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+        
+        div.stButton > button:first-child {
+            background-color: #4f46e5;
+            color: white;
+        }
+        
+        div.stButton > button:first-child:hover {
+            background-color: #4338ca;
+        }
+        
+        div.stDownloadButton > button {
+            width: 100%;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            background-color: #4f46e5;
+            color: white;
+        }
+        
+        div.stDownloadButton > button:hover {
+            background-color: #4338ca;
         }
     </style>
     """, unsafe_allow_html=True)
     
     with st.sidebar:
-        st.markdown("""
-        <div class="sidebar-header">
-            <div class="sidebar-title">
-                <i class="fas fa-chart-bar"></i> TalentMetrics
-            </div>
-            <div class="sidebar-subtitle">
-                채용 데이터를 시각화하고 핵심 인사이트를 발견하는 HR 대시보드 솔루션
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
+        # 데이터 섹션으로 바로 시작 (헤더 제거)
         if df is None:
-            st.markdown('<div class="section-title"><i class="fas fa-file-import"></i> 데이터 가져오기</div>', unsafe_allow_html=True)
-            
+            # 데이터 입력 섹션을 하나의 박스로 통합
             st.markdown("""
-            <div class="sidebar-tip">
-                <i class="fas fa-lightbulb"></i> Excel 파일을 업로드하거나 데모 데이터를 사용하여 시작하세요.
+            <div class="file-upload-container">
+                <div class="file-upload-header">
+                    <i class="fas fa-file-excel"></i>
+                    <span>데이터 입력</span>
+                </div>
+                <div class="file-upload-desc">
+                    분석할 Excel 파일을 업로드하거나 데모 데이터를 사용하세요
+                </div>
             </div>
             """, unsafe_allow_html=True)
             
             uploaded_file = st.file_uploader(
-                "엑셀 파일 업로드",
+                "",
                 type=["xlsx", "xls"],
-                help="채용 데이터가 포함된 엑셀 파일을 업로드하세요.",
-                key="file_uploader"
+                help="HR 데이터가 포함된 Excel 파일을 업로드하세요",
+                key="file_uploader",
+                label_visibility="collapsed"
             )
             
             config["uploaded_file"] = uploaded_file
             
+            # 버튼 컨테이너 추가
+            st.markdown("""
+            <div class="button-container">
+            """, unsafe_allow_html=True)
+            
             col1, col2 = st.columns(2)
             with col1:
                 if st.button(
-                    "데모 데이터 사용", 
-                    help="샘플 데이터로 대시보드를 체험해보세요.", 
+                    "데모 데이터", 
+                    help="샘플 데이터로 시작하기", 
                     key="demo_btn",
                     use_container_width=True
                 ):
@@ -221,25 +251,30 @@ def render_sidebar(df=None):
             with col2:
                 if st.button(
                     "초기화", 
-                    help="모든 설정을 초기화합니다.", 
+                    help="설정 초기화", 
                     key="reset_btn",
                     use_container_width=True
                 ):
                     st.experimental_rerun()
-            
+                    
             st.markdown("""
-            <div class="sidebar-tip">
-                <i class="fas fa-info-circle"></i> 데모 데이터는 실제 HR 데이터 형식을 반영한 가상의 샘플입니다.
             </div>
             """, unsafe_allow_html=True)
         else:
-            st.markdown('<div class="section-title"><i class="fas fa-table"></i> 데이터 미리보기</div>', unsafe_allow_html=True)
+            # 데이터 선택 섹션
+            st.markdown("""
+            <div class="new-sidebar-section">
+                <div class="new-sidebar-section-title">
+                    <i class="fas fa-table"></i> 데이터 선택
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             
-            with st.expander("데이터 샘플", expanded=True):
-                st.dataframe(df.head(3), use_container_width=True)
+            st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
+            st.markdown('<div class="new-form-label">분석할 데이터 미리보기</div>', unsafe_allow_html=True)
+            st.dataframe(df.head(3), use_container_width=True, height=120)
             
-            st.markdown('<div class="section-title"><i class="fas fa-cog"></i> 데이터 설정</div>', unsafe_allow_html=True)
-            
+            # 열 선택
             suggested_cat_cols, suggested_val_cols = suggest_columns(df)
             all_columns = df.columns.tolist()
             
@@ -247,13 +282,14 @@ def render_sidebar(df=None):
             if suggested_cat_cols and suggested_cat_cols[0] in all_columns:
                 cat_index = all_columns.index(suggested_cat_cols[0])
             
-            st.markdown('<label>부서/카테고리 열 선택</label>', unsafe_allow_html=True)
+            st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
+            st.markdown('<div class="new-form-label">분류 기준 열</div>', unsafe_allow_html=True)
             category_col = st.selectbox(
                 "",
                 all_columns,
                 index=cat_index,
                 key="category_col_select",
-                help="그룹화할 카테고리 열을 선택하세요 (예: 부서, 지역 등)",
+                help="데이터를 그룹화할 카테고리 열 (부서, 팀, 지역 등)",
                 label_visibility="collapsed"
             )
             st.markdown('</div>', unsafe_allow_html=True)
@@ -264,35 +300,44 @@ def render_sidebar(df=None):
             if suggested_val_cols and suggested_val_cols[0] in all_columns:
                 val_index = all_columns.index(suggested_val_cols[0])
             
-            st.markdown('<label>인원수/값 열 선택</label>', unsafe_allow_html=True)
+            st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
+            st.markdown('<div class="new-form-label">수치 데이터 열</div>', unsafe_allow_html=True)
             value_col = st.selectbox(
                 "",
                 all_columns,
                 index=val_index,
                 key="value_col_select",
-                help="분석할 수치 데이터 열을 선택하세요 (예: 인원수, 예산 등)",
+                help="분석할 숫자 데이터가 포함된 열 (인원수, 예산 등)",
                 label_visibility="collapsed"
             )
             st.markdown('</div>', unsafe_allow_html=True)
             
             config["value_col"] = value_col
             
-            st.markdown('<div class="section-title"><i class="fas fa-sliders-h"></i> 추가 설정</div>', unsafe_allow_html=True)
+            # 추가 설정 섹션
+            st.markdown("""
+            <div class="new-sidebar-section">
+                <div class="new-sidebar-section-title">
+                    <i class="fas fa-cog"></i> 추가 설정
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             
-            with st.expander("고급 옵션", expanded=False):
-                st.markdown('<label>날짜 열 (선택사항)</label>', unsafe_allow_html=True)
+            with st.expander("고급 설정", expanded=False):
+                st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
+                st.markdown('<div class="new-form-label">날짜 열 (선택사항)</div>', unsafe_allow_html=True)
                 date_col = st.selectbox(
                     "",
                     ["없음"] + all_columns,
                     index=0,
-                    help="시간별 추세 분석을 위한 날짜 열",
+                    help="시간 기반 분석을 위한 날짜 열",
                     label_visibility="collapsed"
                 )
+                config["date_col"] = date_col if date_col != "없음" else None
                 st.markdown('</div>', unsafe_allow_html=True)
                 
-                config["date_col"] = date_col if date_col != "없음" else None
-                
-                st.markdown('<label>예산 열 (선택사항)</label>', unsafe_allow_html=True)
+                st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
+                st.markdown('<div class="new-form-label">예산 열 (선택사항)</div>', unsafe_allow_html=True)
                 budget_col = st.selectbox(
                     "",
                     ["없음"] + all_columns,
@@ -300,11 +345,11 @@ def render_sidebar(df=None):
                     help="예산 분석을 위한 열",
                     label_visibility="collapsed"
                 )
+                config["budget_col"] = budget_col if budget_col != "없음" else None
                 st.markdown('</div>', unsafe_allow_html=True)
                 
-                config["budget_col"] = budget_col if budget_col != "없음" else None
-                
-                st.markdown('<label>성별 열 (선택사항)</label>', unsafe_allow_html=True)
+                st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
+                st.markdown('<div class="new-form-label">성별 열 (선택사항)</div>', unsafe_allow_html=True)
                 gender_col = st.selectbox(
                     "",
                     ["없음"] + all_columns,
@@ -312,25 +357,24 @@ def render_sidebar(df=None):
                     help="성별 분석을 위한 열",
                     label_visibility="collapsed"
                 )
+                config["gender_col"] = gender_col if gender_col != "없음" else None
                 st.markdown('</div>', unsafe_allow_html=True)
                 
-                config["gender_col"] = gender_col if gender_col != "없음" else None
-                
-                st.markdown('<label>연령 열 (선택사항)</label>', unsafe_allow_html=True)
+                st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
+                st.markdown('<div class="new-form-label">연령 열 (선택사항)</div>', unsafe_allow_html=True)
                 age_col = st.selectbox(
                     "",
                     ["없음"] + all_columns,
                     index=0,
-                    help="연령대 분석을 위한 열",
+                    help="연령 분석을 위한 열",
                     label_visibility="collapsed"
                 )
-                st.markdown('</div>', unsafe_allow_html=True)
-                
                 config["age_col"] = age_col if age_col != "없음" else None
+                st.markdown('</div>', unsafe_allow_html=True)
             
-            st.markdown('<div class="section-title"><i class="fas fa-palette"></i> 시각화 스타일</div>', unsafe_allow_html=True)
-            
-            st.markdown('<label>테마 선택</label>', unsafe_allow_html=True)
+            # 테마 선택
+            st.markdown('<div class="new-form-field">', unsafe_allow_html=True)
+            st.markdown('<div class="new-form-label">시각화 테마</div>', unsafe_allow_html=True)
             dashboard_style = st.selectbox(
                 "",
                 ["모던 블루", "다크 테마", "미니멀리스트", "HR 특화"],
@@ -343,42 +387,46 @@ def render_sidebar(df=None):
             
             config["dashboard_style"] = dashboard_style
             
-            # 색상 미리보기
+            # 테마 프리뷰
             if dashboard_style == "모던 블루":
                 colors = ["#eef2ff", "#c7d2fe", "#818cf8", "#4f46e5", "#3730a3"]
-                theme_desc = "청량감 있는 블루 톤으로 전문적인 느낌의 테마입니다."
+                theme_desc = "깔끔한 블루 기반의 전문적인 테마"
             elif dashboard_style == "다크 테마":
                 colors = ["#1e1b4b", "#312e81", "#4338ca", "#6366f1", "#818cf8"]
-                theme_desc = "어두운 배경에 밝은 색상 포인트의 고급스러운 테마입니다."
+                theme_desc = "어두운 배경의 고급스러운 테마"
             elif dashboard_style == "미니멀리스트":
                 colors = ["#f9fafb", "#f3f4f6", "#e5e7eb", "#9ca3af", "#6b7280"]
-                theme_desc = "심플하고 깔끔한 그레이 톤의 미니멀 테마입니다."
+                theme_desc = "심플한 그레이 계열의 미니멀 테마"
             elif dashboard_style == "HR 특화":
                 colors = ["#ecfdf5", "#a7f3d0", "#6ee7b7", "#10b981", "#065f46"]
-                theme_desc = "HR에 어울리는 친근한 그린 계열의 테마입니다."
+                theme_desc = "HR에 어울리는 그린 계열 테마"
             
             st.markdown(f"""
-            <div class="color-preview">
-                <div class="color-swatch" style="background-color: {colors[0]};"></div>
-                <div class="color-swatch" style="background-color: {colors[1]};"></div>
-                <div class="color-swatch" style="background-color: {colors[2]};"></div>
-                <div class="color-swatch" style="background-color: {colors[3]};"></div>
-                <div class="color-swatch" style="background-color: {colors[4]};"></div>
+            <div class="new-theme-preview">
+                <div class="new-theme-color" style="background-color: {colors[0]};"></div>
+                <div class="new-theme-color" style="background-color: {colors[1]};"></div>
+                <div class="new-theme-color" style="background-color: {colors[2]};"></div>
+                <div class="new-theme-color" style="background-color: {colors[3]};"></div>
+                <div class="new-theme-color" style="background-color: {colors[4]};"></div>
             </div>
-            <p style="font-size: 0.8rem; color: var(--neutral-600); margin-top: 0.5rem;">{theme_desc}</p>
+            <div class="new-theme-caption">{theme_desc}</div>
             """, unsafe_allow_html=True)
             
-            st.markdown('<div class="sidebar-footer">', unsafe_allow_html=True)
-            st.caption(f"마지막 업데이트: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-            
-            # 내보내기 버튼
+            # 설정 내보내기
             st.download_button(
                 label="설정 내보내기",
                 data=str(config),
                 file_name="talent_metrics_config.txt",
                 mime="text/plain",
-                help="현재 대시보드 설정을 저장합니다",
+                help="현재 대시보드 설정을 파일로 저장합니다",
+                use_container_width=True
             )
-            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # 푸터
+            st.markdown(f"""
+            <div class="new-sidebar-footer">
+                TalentMetrics v2.0 • {datetime.datetime.now().strftime('%Y-%m-%d')}
+            </div>
+            """, unsafe_allow_html=True)
     
     return config
